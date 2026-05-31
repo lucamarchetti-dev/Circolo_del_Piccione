@@ -1,73 +1,84 @@
-# React + TypeScript + Vite
+# Gambe 🦵
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+> ⚠️ **Work in Progress** — progetto in sviluppo attivo. La struttura e i file possono cambiare.
 
-Currently, two official plugins are available:
+Minigioco browser a tre corsie controllato dal movimento del corpo, sviluppato per il **Body Motion & AI Hackathon** di ITS Academy Lanciano.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+Il giocatore usa le proprie gambe e anche come controller: spostandosi fisicamente a sinistra, al centro o a destra cambia corsia per evitare gli ostacoli in arrivo.
 
-## React Compiler
+---
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Stack
 
-## Expanding the ESLint configuration
+- React 19 + TypeScript
+- Vite
+- TensorFlow.js (backend WebGL)
+- MoveNet SINGLEPOSE_LIGHTNING
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## Come funziona
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+La webcam riprende il giocatore. MoveNet rileva i keypoint delle anche (`left_hip`, `right_hip`) in tempo reale. La posizione media X delle anche viene tradotta in una delle tre corsie. Gli ostacoli scendono dall'alto: bisogna spostarsi nella corsia libera per evitarli.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+---
+
+## Stato attuale
+
+| Modulo | Stato |
+|---|---|
+| Setup TF.js + MoveNet + webcam | ✅ Fatto |
+| `pose-utils.ts` — keypoint e disegno | ✅ Fatto |
+| `usePoseDetector.ts` — hook camera + rilevamento | ✅ Fatto |
+| `lane-detector.ts` — traduzione posa → corsia | ✅ Fatto |
+| `obstacle-spawner.ts` — generazione ostacoli | ⏳ In corso |
+| `collision.ts` — rilevamento collisioni | ⏳ In corso |
+| `useGameLoop.ts` — loop rAF + delta time | 🔲 Da fare |
+| `useGameState.ts` — punteggio, vite, stato | 🔲 Da fare |
+| `GameCanvas.tsx` — rendering canvas | 🔲 Da fare |
+| `App.tsx` — composizione finale | 🔲 Da fare |
+
+---
+
+## Installazione
+
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+## Avvio
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run dev
 ```
+
+Aprire `http://localhost:5173` con un browser moderno. Concedere l'accesso alla webcam quando richiesto. Posizionarsi a circa 1-2 metri dalla camera in modo che le anche siano visibili nel frame.
+
+---
+
+## Struttura del progetto
+
+```
+src/
+├── hooks/
+│   ├── usePoseDetector.ts   # Camera + MoveNet
+│   ├── useGameLoop.ts       # requestAnimationFrame + delta time
+│   └── useGameState.ts      # Punteggio, vite, stato partita
+├── game/
+│   ├── lane-detector.ts     # Posa → corsia (left/center/right)
+│   ├── obstacle-spawner.ts  # Generazione e movimento ostacoli
+│   └── collision.ts         # Rilevamento collisioni
+├── components/
+│   └── GameCanvas.tsx       # Rendering canvas
+├── pose-utils.ts            # Utility keypoint (dal repo base)
+├── App.tsx                  # Composizione
+└── App.css
+```
+
+---
+
+## Riferimenti
+
+- [Body Motion & AI Hackathon](https://johnnypax.github.io/its-ict-body-detection-challenge/)
+- [Repo base — react-motion-tensorflow-yt](https://github.com/johnnypax/react-motion-tensorflow-yt)
+- [Playlist video setup](https://www.youtube.com/playlist?list=PLoZNHBEyxFQFmAZm3-vnU1v28VKcuQDQ5)
