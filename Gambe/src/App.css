@@ -1,0 +1,19 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.stage {
+  position: relative;
+  width: 640px;
+  height: 480px;
+}
+
+.hidden-video {
+  display: none;
+}
+
+.canvas {
+  display: block;
+}
