@@ -1,257 +1,202 @@
-// #region Import
 import React, { useEffect } from 'react';
 import './App.css'
-import type { PoseDetector } from '@tensorflow-models/pose-detection/dist/pose_detector';
 import * as tf from '@tensorflow/tfjs';
 import * as poseDetection from '@tensorflow-models/pose-detection/dist/index.js';
+// Importiamo tutto correttamente da pose-utils, incluso getKeypoint
 import { drawKeypoints, drawArm, getKeypoint } from './pose-utils';
-// #endregion
 
-// canvas size
-const VIDEO_WIDTH = 1920;
-const VIDEO_HEIGHT = 1080;
+const VIDEO_WIDTH = 640;
+const VIDEO_HEIGHT = 480;
+const BALL_SIZE = 64;
+
+type Ball = {
+  x: number;
+  y: number;
+  speed: number;
+  reset: () => void;
+  update: (dt: number) => void;
+};
 
 function App() {
-  // #region declaration
   const videoRef = React.useRef<HTMLVideoElement | null>(null);
   const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
-  const animationFrameIdRef = React.useRef<number | null>(null);
-  const detectorRef = React.useRef<PoseDetector | null>(null);
-  const wristAboveNouseCounterRef = React.useRef<boolean>(false);
-  const lastWristRaiseTimeCount = React.useRef<number>(0);
 
-  const [cameras, setCameras] = React.useState<MediaDeviceInfo[]>([]);
-  const [selectedCameraId, setSelectedCameraId] = React.useState<string>("");
-  const [wristRaised, setWristRaised] = React.useState<number>(0);
-  // #endregion
+  const detectorRef = React.useRef<poseDetection.PoseDetector | null>(null);
+  const animationRef = React.useRef<number | null>(null);
+  const lastTimeRef = React.useRef(performance.now());
+  const lastPoseRef = React.useRef(0);
+  
+  const currentPoseRef = React.useRef<poseDetection.Pose | null>(null);
+  const ballImageRef = React.useRef<HTMLImageElement | null>(null);
 
-  // Camera initialization
-  useEffect(() => {
-    async function initialize() {
-      try {
-        console.log("Initializing TensorFlow...");
+  const wristRef = React.useRef({ x: 0, y: 0 });
+  const [score, setScore] = React.useState(0);
 
-        await tf.setBackend('webgl');
-        await tf.ready();
+  const ballRef = React.useRef<Ball>({
+    x: 500,
+    y: 100,
+    speed: 140,
 
-        console.log("TensorFlow initialized with WebGL backend.", tf.getBackend());
+    reset() {
+      this.x = Math.random() * (VIDEO_WIDTH - BALL_SIZE);
+      this.y = 0;
+    },
 
-        await setupPoseDetector();
+    update(dt: number) {
+      this.y += this.speed * dt;
+      if (this.y > VIDEO_HEIGHT) this.reset();
+    },
+  });
 
-        console.log("Pose detector initialized.");
-
-        await loadCamera();
-        await startCamera();
-        
-        console.log("Camera initialized.");
+  async function setupPoseDetector() {
+    const detector = await poseDetection.createDetector(
+      poseDetection.SupportedModels.MoveNet,
+      {
+        modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING,
       }
-      catch (error) {
-        console.error('Error initializing camera:', error);
-      }
-    }
-
-    initialize();
-
-    return () => {
-      stopCamera();
-      stopLoopDrawing();
-      detectorRef.current?.dispose();
-    }
-  }, []);
-  useEffect(() => {
-    if (!selectedCameraId)
-      return;
-
-    startCamera();
-  }, [selectedCameraId])
-
-  async function loadCamera() {
-    const devices = await navigator.mediaDevices.enumerateDevices();
-
-    const videoDevices = devices.filter(device => device.kind === 'videoinput');
-
-    setCameras(videoDevices);
+    );
+    detectorRef.current = detector;
   }
 
   async function startCamera() {
-    try {
-      const video = videoRef.current;
+    const video = videoRef.current;
+    if (!video) return;
 
-      if (!video)
-        return;
+    const stream = await navigator.mediaDevices.getUserMedia({
+      video: { width: VIDEO_WIDTH, height: VIDEO_HEIGHT },
+      audio: false,
+    });
 
-      stopCamera();
-
-      // Source of video data stream
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: selectedCameraId ?
-          {
-            width: VIDEO_WIDTH,
-            height: VIDEO_HEIGHT,
-            deviceId: {
-              exact: selectedCameraId
-            }
-          } : {
-            width: VIDEO_WIDTH,
-            height: VIDEO_HEIGHT,
-            // facingMode: 'user'
-          },
-        audio: false
-      });
-
-      video.srcObject = stream;
-
-      video.onloadedmetadata = () => {
-        video.play();
-        startLoopDrawing();       //  Sync of the canvas with the video stream
-      }
-    }
-    catch (error) {
-      console.error('Error accessing webcam:', error);
-    }
+    video.srcObject = stream;
+    video.onloadedmetadata = () => {
+      video.play();
+      loop();
+    };
   }
 
   function stopCamera() {
     const video = videoRef.current;
-
-    if (!video)
-      return;
-
-    const stream = video.srcObject as MediaStream;
-
-    if (stream) {
-      stream.getTracks().forEach(track => track.stop());
-    }
+    const stream = video?.srcObject as MediaStream;
+    stream?.getTracks().forEach(t => t.stop());
   }
 
-  async function drawToCanvas() {
+  async function loop() {
     const video = videoRef.current;
     const canvas = canvasRef.current;
     const detector = detectorRef.current;
 
-    if (!video || !canvas)
-      return;
+    if (!video || !canvas || !detector) return;
 
-    const ctx = canvas.getContext('2d');
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
 
-    if (!ctx)
-      return;
+    const now = performance.now();
+    const dt = (now - lastTimeRef.current) / 1000;
+    lastTimeRef.current = now;
 
+    // sfondo con la telecamera
     ctx.drawImage(video, 0, 0, VIDEO_WIDTH, VIDEO_HEIGHT);
 
-    if(!detector)
-      return;
+    // aggiorna gioco
+    const ball = ballRef.current;
+    ball.update(dt);
 
-    const poses = await detector.estimatePoses(video);
-
-    if(poses.length > 0) {
-      console.log(poses[0]);
-      drawKeypoints(ctx, poses[0]);
-
-      drawArm(ctx, poses[0], 'left');
-      drawArm(ctx, poses[0], 'right');
-
-      updateWristRaised(poses[0], 'left');
-      updateWristRaised(poses[0], 'right');
-    }
-  }
-
-  function startLoopDrawing() {
-    async function loop() {
-      await drawToCanvas();
-      animationFrameIdRef.current = requestAnimationFrame(loop);
+    // rilevamento posa ogni 33ms
+    if (now - lastPoseRef.current > 33) {
+      lastPoseRef.current = now;
+      const poses = await detector.estimatePoses(video);
+      if (poses && poses.length > 0) {
+        currentPoseRef.current = poses[0];
+      }
     }
 
-    loop();
-  }
+    // disegno dello scheletro e tracciamento
+    const activePose = currentPoseRef.current;
+    if (activePose) {
+      // usiamo il getKeypoint di pose-utils (restituisce il punto solo se supera la confidence)
+      const wrist = getKeypoint(activePose, "left_wrist", 0.3);
+      if (wrist) {
+        wristRef.current = { x: wrist.x, y: wrist.y };
+      }
 
-  function stopLoopDrawing() {
-    if (animationFrameIdRef.current) {
-      cancelAnimationFrame(animationFrameIdRef.current);
-      animationFrameIdRef.current = null;
+      // corretto l'ordine dei parametri: (ctx, pose, confidence)
+      drawKeypoints(ctx, activePose, 0.3);
+      
+      // disegniamo sia il braccio destro che sinistro per un effetto rehab completo!
+      drawArm(ctx, activePose, 'left', 0.3);
+      drawArm(ctx, activePose, 'right', 0.3);
     }
-  }
 
-  async function setupPoseDetector() {
-    console.log("Loading pose detector...");
+    // coordinate del polso
+    const wx = wristRef.current.x;
+    const wy = wristRef.current.y;
 
-    const detector = await poseDetection.createDetector(
-      poseDetection.SupportedModels.MoveNet,
-      {
-        modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING
-      });
+    // feedback visivo sul polso (cerchio rosso)
+    ctx.beginPath();
+    ctx.arc(wx, wy, 20, 0, Math.PI * 2);
+    ctx.fillStyle = "red";
+    ctx.fill();
 
-    detectorRef.current = detector;
-  }
-
-  function updateWristRaised(pose: poseDetection.Pose, side: 'left' | 'right') {
-    const nose = getKeypoint(pose, 'nose');
-    const wrist = getKeypoint(pose, `${side}_wrist`);
-
-    if(!nose || !wrist)
-      return;
-
-    const cooldownMs = 800;
-
-    const now  = performance.now();
-    const canCount = now - lastWristRaiseTimeCount.current > cooldownMs;
-    const isWristAboveNose = wrist.y < nose.y;
-
-    if(isWristAboveNose && !wristAboveNouseCounterRef.current && canCount) {
-      setWristRaised(prev => prev + 1);
-      lastWristRaiseTimeCount.current = now;
-      wristAboveNouseCounterRef.current = true;
+    // render dell'immagine reale della palla
+    if (ballImageRef.current && ballImageRef.current.complete) {
+      ctx.drawImage(ballImageRef.current, ball.x, ball.y, BALL_SIZE, BALL_SIZE);
+    } else {
+      ctx.fillStyle = "green";
+      ctx.fillRect(ball.x, ball.y, BALL_SIZE, BALL_SIZE);
     }
-    else if(!isWristAboveNose && wristAboveNouseCounterRef.current) {
-      wristAboveNouseCounterRef.current = false;
+
+    // collisione
+    const hit =
+      wx >= ball.x &&
+      wx <= ball.x + BALL_SIZE &&
+      wy >= ball.y &&
+      wy <= ball.y + BALL_SIZE;
+
+    if (hit) {
+      setScore(s => s + 1);
+      ball.reset();
     }
+
+    animationRef.current = requestAnimationFrame(loop);
   }
 
-  function handleCameraChange(event: React.ChangeEvent<HTMLSelectElement>) {
-    setSelectedCameraId(event.target.value);
-  }
+  useEffect(() => {
+    // inizializza l'immagine (ricordati di mettere ball.png dentro la cartella /public)
+    const img = new Image();
+    img.src = '/ball.png'; 
+    ballImageRef.current = img;
+
+    const init = async () => {
+      await tf.setBackend("webgl");
+      await tf.ready();
+      await setupPoseDetector();
+      await startCamera();
+    };
+
+    init();
+
+    return () => {
+      stopCamera();
+      if (animationRef.current) cancelAnimationFrame(animationRef.current);
+      detectorRef.current?.dispose();
+    };
+  }, []);
 
   return (
-    <>
-      <h1>Pose Browser Demo</h1>
+    <div style={{ textAlign: "center" }}>
+      <h2>Ball Blaster - Rehab Edition</h2>
+      <p style={{ fontSize: '24px', fontWeight: 'bold' }}>Score: {score}</p>
 
-      <label htmlFor="cameraSelect">Select Camera: </label>
-      <select
-        id="cameraSelect"
-        value={selectedCameraId}
-        onChange={handleCameraChange}
-      >
-        {cameras.map((camera, index) => (
-          <option key={index} value={camera.deviceId}>
-            {camera.label || `Camera ${index + 1}`}
-          </option>
-        ))}
-      </select>
+      <canvas
+        ref={canvasRef}
+        width={VIDEO_WIDTH}
+        height={VIDEO_HEIGHT}
+        style={{ border: "2px solid black", maxWidth: "100%", height: "auto" }}
+      />
 
-      <hr />
-
-      <p>Wrist raised count: {wristRaised}</p>
-
-      <div className='stage'>
-        <video
-          ref={videoRef}
-          width={VIDEO_WIDTH}
-          height={VIDEO_HEIGHT}
-          playsInline
-          muted
-          className='hidden-video'
-        ></video>
-
-        <canvas
-          ref={canvasRef}
-          width={VIDEO_WIDTH}
-          height={VIDEO_HEIGHT}
-          style={{ transform: 'scaleX(-1)' }}
-          className='canvas'>
-        </canvas>
-      </div>
-    </>
-  )
+      <video ref={videoRef} style={{ display: "none" }} />
+    </div>
+  );
 }
 
 export default App;
