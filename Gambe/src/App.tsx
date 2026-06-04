@@ -1,251 +1,89 @@
-import React, { useEffect } from 'react';
-import './App.css'
-import type { PoseDetector } from '@tensorflow-models/pose-detection/dist/pose_detector';
-import * as tf from '@tensorflow/tfjs';
-import * as poseDetection from '@tensorflow-models/pose-detection/dist/index.js';
-import { drawKeypoints, drawArm, getKeypoint } from './pose-utils';
+import { useState, useCallback } from 'react';
+import { usePoseDetector } from './hooks/usePoseDetector';
+import { useGameLoop } from './hooks/useGameLoop';
+import { useGameState } from './hooks/useGameState';
+import { detectLane } from './game/lane-detector';
+import { updateObstacles } from './game/obstacle-spawner';
+import { checkCollisions } from './game/collision';
+import { GameCanvas } from './components/GameCanvas';
+import type { Obstacle } from './game/obstacle-spawner';
+import type { Lane } from './game/lane-detector';
+import type { Pose } from '@tensorflow-models/pose-detection/dist/types';
+import './App.css';
 
-const VIDEO_WIDTH = 640;
-const VIDEO_HEIGHT = 480;
+// Carica le immagini degli ostacoli una volta sola
+const OBSTACLE_KEYS = ['roccia.png', 'cactus.png', 'barile.png'];
+const obstacleImages: Record<string, HTMLImageElement> = {};
+OBSTACLE_KEYS.forEach(key => {
+  const img = new Image();
+  img.src = `/obstacles/${key}`;
+  obstacleImages[key] = img;
+});
 
-function App() {
-  const videoRef = React.useRef<HTMLVideoElement | null>(null);
-  const canvasRef = React.useRef<HTMLCanvasElement | null>(null);
-  const animationFrameIdRef = React.useRef<number | null>(null);
-  const detectorRef = React.useRef<PoseDetector | null>(null);
-  const wristAboveNouseCounterRef = React.useRef<boolean>(false);
-  const lastWristRaiseTimeCount = React.useRef<number>(0);
+export default function App() {
+  const { videoRef, detectPose, VIDEO_WIDTH, VIDEO_HEIGHT } = usePoseDetector();
+  const { state, start, addScore, loseLife, reset } = useGameState();
 
-  const [cameras, setCameras] = React.useState<MediaDeviceInfo[]>([]);
-  const [selectedCameraId, setSelectedCameraId] = React.useState<string>("");
-  const [wristRaised, setWristRaised] = React.useState<number>(0);
+  const [obstacles, setObstacles] = useState<Obstacle[]>([]);
+  const [playerLane, setPlayerLane] = useState<Lane>('center');
+  const [pose, setPose] = useState<Pose | null>(null);
 
-  useEffect(() => {
-    async function initialize() {
-      try {
-        console.log("Initializing TensorFlow...");
-
-        await tf.setBackend('webgl');
-        await tf.ready();
-
-        console.log("TensorFlow initialized with WebGL backend.", tf.getBackend());
-
-        await setupPoseDetector();
-
-        console.log("Pose detector initialized.");
-
-        await loadCamera();
-        await startCamera();
-        
-        console.log("Camera initialized.");
+  // Tasto SPAZIO per start / restart
+  useState(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.code !== 'Space') return;
+      if (state.status === 'idle' || state.status === 'gameover') {
+        reset();
+        start();
       }
-      catch (error) {
-        console.error('Error initializing camera:', error);
-      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  });
+
+  const gameLoop = useCallback(async (deltaMs: number, now: number) => {
+    // 1. Rileva posa
+    const currentPose = await detectPose();
+    setPose(currentPose);
+
+    if (state.status !== 'playing') return;
+
+    // 2. Corsia giocatore
+    if (currentPose) {
+      const lane = detectLane(currentPose, VIDEO_WIDTH);
+      setPlayerLane(lane);
     }
 
-    initialize();
+    // 3. Aggiorna ostacoli
+    const { obstacles: updated, missed } = updateObstacles(
+      obstacles, deltaMs, now, state.score, VIDEO_HEIGHT
+    );
 
-    return () => {
-      stopCamera();
-      stopLoopDrawing();
-      detectorRef.current?.dispose();
-    }
-  }, []);
+    // 4. Collisioni
+    const { hit, safeObstacles } = checkCollisions(updated, playerLane);
 
-  useEffect(() => {
-    if (!selectedCameraId)
-      return;
+    setObstacles(safeObstacles);
 
-    startCamera();
-  }, [selectedCameraId])
+    if (missed > 0) addScore(missed * 10);
+    if (hit) loseLife();
 
-  async function loadCamera() {
-    const devices = await navigator.mediaDevices.enumerateDevices();
+  }, [state, obstacles, playerLane, detectPose, addScore, loseLife, VIDEO_WIDTH, VIDEO_HEIGHT]);
 
-    const videoDevices = devices.filter(device => device.kind === 'videoinput');
-
-    setCameras(videoDevices);
-  }
-
-  async function startCamera() {
-    try {
-      const video = videoRef.current;
-
-      if (!video)
-        return;
-
-      stopCamera();
-
-      // Source of video data stream
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: selectedCameraId ?
-          {
-            width: VIDEO_WIDTH,
-            height: VIDEO_HEIGHT,
-            deviceId: {
-              exact: selectedCameraId
-            }
-          } : {
-            width: VIDEO_WIDTH,
-            height: VIDEO_HEIGHT,
-            // facingMode: 'user'
-          },
-        audio: false
-      });
-
-      video.srcObject = stream;
-
-      video.onloadedmetadata = () => {
-        video.play();
-        startLoopDrawing();       //  Sync of the canvas with the video stream
-      }
-    }
-    catch (error) {
-      console.error('Error accessing webcam:', error);
-    }
-  }
-
-  function stopCamera() {
-    const video = videoRef.current;
-
-    if (!video)
-      return;
-
-    const stream = video.srcObject as MediaStream;
-
-    if (stream) {
-      stream.getTracks().forEach(track => track.stop());
-    }
-  }
-
-  async function drawToCanvas() {
-    const video = videoRef.current;
-    const canvas = canvasRef.current;
-    const detector = detectorRef.current;
-
-    if (!video || !canvas)
-      return;
-
-    const ctx = canvas.getContext('2d');
-
-    if (!ctx)
-      return;
-
-    ctx.drawImage(video, 0, 0, VIDEO_WIDTH, VIDEO_HEIGHT);
-
-    if(!detector)
-      return;
-
-    const poses = await detector.estimatePoses(video);
-
-    if(poses.length > 0) {
-      console.log(poses[0]);
-      drawKeypoints(ctx, poses[0]);
-
-      drawArm(ctx, poses[0], 'left');
-      drawArm(ctx, poses[0], 'right');
-
-      updateWristRaised(poses[0], 'left');
-      updateWristRaised(poses[0], 'right');
-    }
-  }
-
-  function startLoopDrawing() {
-    async function loop() {
-      await drawToCanvas();
-      animationFrameIdRef.current = requestAnimationFrame(loop);
-    }
-
-    loop();
-  }
-
-  function stopLoopDrawing() {
-    if (animationFrameIdRef.current) {
-      cancelAnimationFrame(animationFrameIdRef.current);
-      animationFrameIdRef.current = null;
-    }
-  }
-
-  async function setupPoseDetector() {
-    console.log("Loading pose detector...");
-
-    const detector = await poseDetection.createDetector(
-      poseDetection.SupportedModels.MoveNet,
-      {
-        modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING
-      });
-
-    detectorRef.current = detector;
-  }
-
-  function updateWristRaised(pose: poseDetection.Pose, side: 'left' | 'right') {
-    const nose = getKeypoint(pose, 'nose');
-    const wrist = getKeypoint(pose, `${side}_wrist`);
-
-    if(!nose || !wrist)
-      return;
-
-    const cooldownMs = 800;
-
-    const now  = performance.now();
-    const canCount = now - lastWristRaiseTimeCount.current > cooldownMs;
-    const isWristAboveNose = wrist.y < nose.y;
-
-    if(isWristAboveNose && !wristAboveNouseCounterRef.current && canCount) {
-      setWristRaised(prev => prev + 1);
-      lastWristRaiseTimeCount.current = now;
-      wristAboveNouseCounterRef.current = true;
-    }
-    else if(!isWristAboveNose && wristAboveNouseCounterRef.current) {
-      wristAboveNouseCounterRef.current = false;
-    }
-  }
-
-  function handleCameraChange(event: React.ChangeEvent<HTMLSelectElement>) {
-    setSelectedCameraId(event.target.value);
-  }
+  useGameLoop(gameLoop, true);
 
   return (
-    <>
-      <h1>Pose Browser Demo</h1>
-
-      <label htmlFor="cameraSelect">Select Camera: </label>
-      <select
-        id="cameraSelect"
-        value={selectedCameraId}
-        onChange={handleCameraChange}
-      >
-        {cameras.map((camera, index) => (
-          <option key={index} value={camera.deviceId}>
-            {camera.label || `Camera ${index + 1}`}
-          </option>
-        ))}
-      </select>
-
-      <hr />
-
-      <p>Wrist raised count: {wristRaised}</p>
-
-      <div className='stage'>
-        <video
-          ref={videoRef}
-          width={VIDEO_WIDTH}
-          height={VIDEO_HEIGHT}
-          playsInline
-          muted
-          className='hidden-video'
-        ></video>
-
-        <canvas
-          ref={canvasRef}
-          width={VIDEO_WIDTH}
-          height={VIDEO_HEIGHT}
-          className='canvas'>
-        </canvas>
-      </div>
-    </>
-  )
+    <div className="stage">
+      <video ref={videoRef} className="hidden-video" playsInline />
+      <GameCanvas
+        videoRef={videoRef}
+        pose={pose}
+        obstacles={obstacles}
+        playerLane={playerLane}
+        gameState={state}
+        width={VIDEO_WIDTH}
+        height={VIDEO_HEIGHT}
+        obstacleImages={obstacleImages}
+      />
+    </div>
+  );
 }
-
-export default App
