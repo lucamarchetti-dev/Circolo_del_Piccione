@@ -1,19 +1,130 @@
+@import url('https://fonts.googleapis.com/css2?family=Bungee&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+/* ==========================================
+   1. RESET GLOBALE E CONFIGURAZIONE PAGINA
+   ========================================== */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
 }
 
+body {
+  font-family: system-ui, -apple-system, sans-serif;
+  /*background-color: #754703; /* Sfondo scuro per far risaltare il gioco */
+  background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.1)),
+              url("/images/legna.jpg");
+  color: #ffffff;
+  min-height:100%;
+  overflow: auto; 
+}
+
+/* ==========================================
+   2. LAYOUT PRINCIPALE (FLEXBOX)
+   ========================================== */
+
+/* Contenitore principale di tutta la pagina */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Forza l'altezza a tutto schermo */
+}
+
+/* Header in alto */
+.app-header {
+  background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0,0,0,0.2)),
+  url("https://i.pinimg.com/1200x/da/c2/3b/dac23b8c9e0a7dc69f5cbf20a07c86be.jpg");  
+  background-size: cover;
+  background-position: center;
+  color: rgb(248, 248, 3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 20px 10px;
+  width: 100%;
+  height: 380px; /* tutta la schermata */
+  min-height: 380px;
+  align-items: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+  z-index: 10;
+}
+
+.app-header h1 {
+  font-family: 'Press Start 2P', sans-serif;
+  font-size: 3.5rem;
+  font-weight: 700;
+  text-align: center;
+  text-shadow: 3px 3px 0px rgba(0, 0, 0, 0.8); /* Opzionale: un'ombra netta ci sta benissimo */
+}
+
+ p {
+  color: rgb(123, 177, 81);
+  font-family: 'Bungee', sans-serif;
+  text-shadow: 3px 3px 0px rgba(32, 42, 13, 0.8); /* Opzionale: un'ombra netta ci sta benissimo */
+  font-size: 1.6rem;
+  font-weight: 500;
+  text-align: center;
+}
+
+
+.game-stats {
+  font-size: 1.2rem;
+  font-weight: bold;
+  background-color: #ab9d05;
+  padding: 8px 20px;
+  border-radius: 14px;
+
+  /* --- MODIFICHE PER RENDERLO PICCOLO E CENTRATO --- */
+  width: fit-content;      /* Si stringe intorno al testo 'Punteggio: X' */
+  margin: 15px auto 0 auto; /* Lo stacca dall'header e lo centra orizzontalmente */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Area centrale che si espande e centra il gioco */
+.game-main {
+  flex: 1; /* Prende tutto lo spazio verticale rimasto tra header e footer */
+  display: flex;
+  justify-content: center; /* Centra orizzontalmente */
+  align-items: center;     /* Centra verticalmente */
+  padding: 20px;
+}
+
+
+
+/* Footer in basso */
+.app-footer {
+  background-color: #080808;
+  padding: 12px;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #bdc3c7;
+  border-top: 1px solid #785a22;
+}
+
+/* ==========================================
+   3. STRUTTURA DEL GIOCO (LE TUE CLASSI)
+   ========================================== */
+
+/* Il quadrante di gioco fisso e centrato */
 .stage {
   position: relative;
   width: 640px;
   height: 480px;
+  background-color: #2d2d2d; /* Sfondo di sicurezza */
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+  border-radius: 8px;
+  overflow: hidden; /* Evita che elementi del gioco escano dai bordi */
 }
 
-.hidden-video {
-  display: none;
-}
-
+/* Il canvas riempie perfettamente lo stage di 640x480 */
 .canvas {
   display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Nasconde la webcam di TensorFlow sullo sfondo */
+.hidden-video {
+  display: none;
 }

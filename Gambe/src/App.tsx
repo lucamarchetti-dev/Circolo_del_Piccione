@@ -72,18 +72,43 @@ export default function App() {
   useGameLoop(gameLoop, true);
 
   return (
-    <div className="stage">
-      <video ref={videoRef} className="hidden-video" playsInline />
-      <GameCanvas
-        videoRef={videoRef}
-        pose={pose}
-        obstacles={obstacles}
-        playerLane={playerLane}
-        gameState={state}
-        width={VIDEO_WIDTH}
-        height={VIDEO_HEIGHT}
-        obstacleImages={obstacleImages}
-      />
+     <div className="app-container">
+      {/* HEADER */}
+      <header className="app-header">
+        <h1>GAMBE - Pose Runner</h1>
+      </header>
+
+      <p>Chi l'ha detto che la riabilitazione è solo noia? Metti in moto le gambe, schiva cactus, barili e rocce come un vero cowboy e trasforma la tua terapia nella sfida pixelata più divertente del West!</p>
+
+      <div className="game-stats">
+          <span>Punteggio: {state.score}</span>
+      </div>
+
+      {/* CONTENITORE CENTRALE DEL GIOCO */}
+      <main className="game-main">
+        <div className="stage">
+          <video ref={videoRef} className="hidden-video" playsInline />
+          <GameCanvas
+            videoRef={videoRef}
+            pose={pose}
+            obstacles={obstacles}
+            playerLane={playerLane}
+            gameState={state}
+            width={VIDEO_WIDTH}
+            height={VIDEO_HEIGHT}
+            obstacleImages={obstacleImages}
+          />
+        </div>
+      </main>
+
+      
+
+      {/* FOOTER */}
+      <footer className="app-footer">
+        <h3>Usa i movimenti del corpo per giocare | Alimentato da TensorFlow.js</h3>
+      </footer>
     </div>
   );
+
+
 }
