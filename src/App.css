@@ -1,7 +1,8 @@
 .hidden-video{
     border: 1px solid black;
-    display: none;
+    /*display: none;*/
 }
 .canvas{
+    width: 1920px !important;
     border: 1px solid black;
 }
