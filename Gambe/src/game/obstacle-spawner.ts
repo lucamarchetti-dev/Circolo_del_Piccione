@@ -8,7 +8,7 @@ export interface Obstacle {
   imageKey: string;
 }
 
-const OBSTACLE_IMAGES = ['rock.png', 'cactus.png', 'barrel.png'];
+const OBSTACLE_IMAGES = ['roccia.png', 'cactus.png', 'barile.png'];
 const LANES: ObstacleLane[] = ['left', 'center', 'right'];
 
 let nextId = 0;
@@ -16,12 +16,12 @@ let lastSpawnTime = 0;
 
 // Restituisce lo spawn interval in ms in base al punteggio
 function spawnInterval(score: number): number {
-  return Math.max(600, 1800 - score * 10);
+  return Math.max(1100, 2800 - score * 8);
 }
 
 // Restituisce la velocità in px/ms in base al punteggio
 function obstacleSpeed(score: number): number {
-  return 0.3 + score * 0.005;
+  return 0.20 + score * 0.0001;
 }
 
 export function updateObstacles(

@@ -121,6 +121,7 @@ export function GameCanvas({
       ctx.textAlign = 'left';
     }
 
+
   }); // nessuna dependency: ridisegna ad ogni render
 
   return (
@@ -129,6 +130,11 @@ export function GameCanvas({
       width={width}
       height={height}
       className="canvas"
+      style={{ 
+        border: "2px solid black", 
+        maxWidth: "100%", 
+        height: "auto"
+      }}
     />
   );
 }

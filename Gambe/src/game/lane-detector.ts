@@ -23,8 +23,8 @@ export function detectLane(pose: Pose, frameWidth: number): Lane {
   // Media mobile per evitare cambi di corsia nervosi
   const smoothedX = hipXHistory.reduce((a, b) => a + b, 0) / hipXHistory.length;
 
-  if (smoothedX < frameWidth / 3) return 'left';
-  if (smoothedX > (frameWidth / 3) * 2) return 'right';
+  if (smoothedX < frameWidth / 3) return 'right';
+  if (smoothedX > (frameWidth / 3) * 2) return 'left';
   return 'center';
 }
 
