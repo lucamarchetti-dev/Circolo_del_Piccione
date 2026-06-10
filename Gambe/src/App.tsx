@@ -75,7 +75,7 @@ export default function App() {
      <div className="app-container">
       {/* HEADER */}
       <header className="app-header">
-        <h1>GAMBE - Pose Runner</h1>
+        <h1>GAMBE</h1>
       </header>
 
       <p>Chi l'ha detto che la riabilitazione è solo noia? Metti in moto le gambe, schiva cactus, barili e rocce come un vero cowboy e trasforma la tua terapia nella sfida pixelata più divertente del West!</p>
