@@ -70,6 +70,12 @@ function PigeonBlaster() {
       poseDetection.SupportedModels.MoveNet,
       {
         modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING,
+        // modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING,
+        // meglio per uso piu' leggero di GPU
+        // modelType: poseDetection.movenet.modelType.SINGLEPOSE_THUNDER
+        // per identificare meglio polsi, more accurate ma piu' pesante
+        // modelType: poseDetection.movenet.modelType.MULTIPOSE_LIGHTNING
+        // per piu' persone, dovrebbe funzionare in multiplayer
       }
     );
     detectorRef.current = detector;
@@ -306,15 +312,15 @@ function PigeonBlaster() {
 
   useEffect(() => {
     const img = new Image();
-    img.src = '/Pigeon.png'; 
+    img.src = 'src/assets/Pigeon.png'; 
     PigeonImageRef.current = img;
 
     const imgFull = new Image();
-    imgFull.src = '/heart_full.png';
+    imgFull.src = 'src/assets//heart_full.png';
     heartFullImgRef.current = imgFull;
 
     const imgDead = new Image();
-    imgDead.src = '/heart_dead.png';
+    imgDead.src = 'src/assets//heart_dead.png';
     heartDeadImgRef.current = imgDead;
 
     const init = async () => {
