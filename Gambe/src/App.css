@@ -12,8 +12,8 @@
 body {
   font-family: system-ui, -apple-system, sans-serif;
   /*background-color: #754703; /* Sfondo scuro per far risaltare il gioco */
-  background: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.1)),
-              url("/images/legna.jpg");
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.2)),
+              url("/images/sfondo3.jpg");
   color: #ffffff;
   min-height:100%;
   overflow: auto; 
@@ -33,23 +33,22 @@ body {
 /* Header in alto */
 .app-header {
   background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(0,0,0,0.2)),
-  url("https://i.pinimg.com/1200x/da/c2/3b/dac23b8c9e0a7dc69f5cbf20a07c86be.jpg");  
+  url("/images/omini.gif");  
   background-size: cover;
   background-position: center;
-  color: rgb(248, 248, 3);
+  color: rgb(248, 170, 3);
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
   padding: 20px 10px;
   width: 100%;
-  height: 380px; /* tutta la schermata */
-  min-height: 380px;
+  height: 350px; /* tutta la schermata */
+  min-height: 350px;
   align-items: center;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
   z-index: 10;
 }
-
 
 .app-header h1 {
   font-family: 'Press Start 2P', sans-serif;
@@ -62,7 +61,7 @@ body {
  p {
   color: rgb(223, 187, 104);
   font-family: 'Bungee', sans-serif;
-  text-shadow: 3px 3px 0px rgba(32, 42, 13, 0.8); /* Opzionale: un'ombra netta ci sta benissimo */
+  text-shadow: 3px 3px 0px rgba(82, 56, 8, 0.8); /* Opzionale: un'ombra netta ci sta benissimo */
   font-size: 1.6rem;
   font-weight: 500;
   text-align: center;
@@ -72,7 +71,7 @@ body {
 .game-stats {
   font-size: 1.2rem;
   font-weight: bold;
-  background-color: #ab9d05;
+  background-color: #7d4b0897;
   padding: 8px 20px;
   border-radius: 14px;
 
