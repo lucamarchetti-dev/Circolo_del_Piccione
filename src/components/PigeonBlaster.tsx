@@ -1,8 +1,9 @@
 import React, { useEffect } from 'react';
-import '../App.css'; 
+import './PigeonBlaster.css'; 
 import * as tf from '@tensorflow/tfjs';
 import * as poseDetection from '@tensorflow-models/pose-detection/dist/index.js';
 import { drawKeypoints, drawArm, getKeypoint } from '../pose-utils'; 
+import piccioneTerra from '../assets/png/piccione-terra.png';
 
 const VIDEO_WIDTH = 640;
 const VIDEO_HEIGHT = 480;
@@ -312,15 +313,15 @@ function PigeonBlaster() {
 
   useEffect(() => {
     const img = new Image();
-    img.src = 'src/assets/Pigeon.png'; 
+    img.src = 'src/assets/png/piccione-volante.png'; 
     PigeonImageRef.current = img;
 
     const imgFull = new Image();
-    imgFull.src = 'src/assets//heart_full.png';
+    imgFull.src = 'src/assets/png/cuoricino-vite.png';
     heartFullImgRef.current = imgFull;
 
     const imgDead = new Image();
-    imgDead.src = 'src/assets//heart_dead.png';
+    imgDead.src = 'src/assets/png//vita.png';
     heartDeadImgRef.current = imgDead;
 
     const init = async () => {
@@ -345,26 +346,111 @@ function PigeonBlaster() {
     }
   }, [selectedDeviceId]);
 
-  return (
-    <div style={{ textAlign: "center", fontFamily: "sans-serif", padding: "10px" }}>
-      <h2>Pigeon Blaster 🐦</h2>
+  // return (
+  //   <div style={{ textAlign: "center", fontFamily: "sans-serif", padding: "10px" }}>
+  //     <h2>Pigeon Blaster 🐦</h2>
       
-      <div style={{ margin: "10px auto", display: "flex", justifyContent: "center", gap: "25px", fontSize: "18px" }}>
+  //     <div style={{ margin: "10px auto", display: "flex", justifyContent: "center", gap: "25px", fontSize: "18px" }}>
+  //       <span>Punteggio Corrente: <strong>{score}</strong></span>
+  //       <span>Vite: <strong>{lives}/3</strong></span>
+  //       <span>Record Attuale: <strong>{highScore}</strong></span>
+  //     </div>
+
+  //     <div style={{ marginBottom: "15px", display: "flex", justifyContent: "center", gap: "15px", alignItems: "center" }}>
+  //       <div>
+  //         <label htmlFor="camera-select" style={{ marginRight: "10px", fontWeight: "bold" }}>
+  //           Fotocamera: 
+  //         </label>
+  //         <select
+  //           id="camera-select"
+  //           value={selectedDeviceId}
+  //           onChange={(e) => setSelectedDeviceId(e.target.value)}
+  //           style={{ padding: "6px 12px", fontSize: "16px", borderRadius: "4px" }}
+  //         >
+  //           {devices.map((device) => (
+  //             <option key={device.deviceId} value={device.deviceId}>
+  //               {device.label || `Camera ${device.deviceId.slice(0, 5)}`}
+  //             </option>
+  //           ))}
+  //         </select>
+  //       </div>
+
+  //       {isGameOver && (
+  //         <button 
+  //           onClick={restartGame}
+  //           style={{
+  //             padding: "8px 16px",
+  //             fontSize: "16px",
+  //             fontWeight: "bold",
+  //             backgroundColor: "#FF3333",
+  //             color: "white",
+  //             border: "none",
+  //             borderRadius: "4px",
+  //             cursor: "pointer"
+  //           }}
+  //         >
+  //           Riprova 🔄
+  //         </button>
+  //       )}
+  //     </div>
+
+  //     <canvas
+  //       ref={canvasRef}
+  //       width={VIDEO_WIDTH}
+  //       height={VIDEO_HEIGHT}
+  //       style={{ 
+  //         border: "3px solid #333", 
+  //         borderRadius: "8px",
+  //         maxWidth: "100%", 
+  //         height: "auto",
+  //         transform: "scaleX(-1)" 
+  //       }}
+  //     />
+
+  //     <video ref={videoRef} style={{ display: "none" }} />
+  //   </div>
+  // );
+
+  return (
+    <div className="game-container">
+      {/* Header con Titoli e Piccioni Specchiati */}
+      <div className="header-container">
+        <img 
+          src={piccioneTerra} 
+          alt="Piccione decorativo sinistro" 
+          className="pigeon-decor pigeon-left" 
+        />
+        
+        <div className="title-wrapper">
+          <h1 className="main-title">Pigeon Blaster</h1>
+          <span className="subtitle">rehab edition</span>
+        </div>
+
+        <img 
+          src={piccioneTerra} 
+          alt="Piccione decorativo destro" 
+          className="pigeon-decor pigeon-right" 
+        />
+      </div>
+      
+      {/* Info di Gioco */}
+      <div className="stats-bar">
         <span>Punteggio Corrente: <strong>{score}</strong></span>
         <span>Vite: <strong>{lives}/3</strong></span>
         <span>Record Attuale: <strong>{highScore}</strong></span>
       </div>
 
-      <div style={{ marginBottom: "15px", display: "flex", justifyContent: "center", gap: "15px", alignItems: "center" }}>
+      {/* Controlli di Configurazione */}
+      <div className="controls-bar">
         <div>
-          <label htmlFor="camera-select" style={{ marginRight: "10px", fontWeight: "bold" }}>
+          <label htmlFor="camera-select" className="camera-label">
             Fotocamera: 
           </label>
           <select
             id="camera-select"
             value={selectedDeviceId}
             onChange={(e) => setSelectedDeviceId(e.target.value)}
-            style={{ padding: "6px 12px", fontSize: "16px", borderRadius: "4px" }}
+            className="camera-select"
           >
             {devices.map((device) => (
               <option key={device.deviceId} value={device.deviceId}>
@@ -375,35 +461,18 @@ function PigeonBlaster() {
         </div>
 
         {isGameOver && (
-          <button 
-            onClick={restartGame}
-            style={{
-              padding: "8px 16px",
-              fontSize: "16px",
-              fontWeight: "bold",
-              backgroundColor: "#FF3333",
-              color: "white",
-              border: "none",
-              borderRadius: "4px",
-              cursor: "pointer"
-            }}
-          >
+          <button onClick={restartGame} className="btn-retry">
             Riprova 🔄
           </button>
         )}
       </div>
 
+      {/* Schermo di gioco */}
       <canvas
         ref={canvasRef}
         width={VIDEO_WIDTH}
         height={VIDEO_HEIGHT}
-        style={{ 
-          border: "3px solid #333", 
-          borderRadius: "8px",
-          maxWidth: "100%", 
-          height: "auto",
-          transform: "scaleX(-1)" 
-        }}
+        className="game-canvas"
       />
 
       <video ref={videoRef} style={{ display: "none" }} />
