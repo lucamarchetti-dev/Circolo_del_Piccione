@@ -109,8 +109,8 @@ body {
 /* Il quadrante di gioco fisso e centrato */
 .stage {
   position: relative;
-  width: 640px;
-  height: 480px;
+  width: 930px;
+  height: 700px;
   background-color: #2d2d2d; /* Sfondo di sicurezza */
   box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
   border-radius: 8px;
