@@ -1,11 +1,15 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useState } from 'react';
 import type { Pose } from '@tensorflow-models/pose-detection/dist/types';
 import type { Obstacle } from '../game/obstacle-spawner';
 import type { Lane } from '../game/lane-detector';
 import type { GameState } from '../hooks/useGameState';
 
+
 const playerImage = new Image();
 playerImage.src = '/player.png';
+
+const backgroundImage = new Image();
+backgroundImage.src = '/farwest_road.jpeg';
 
 const LANE_COLORS = {
   left:   'rgba(255,255,255,0.08)',
@@ -32,6 +36,18 @@ export function GameCanvas({
   gameState, width, height, obstacleImages,
 }: Props) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [_assetsLoaded, setAssetsLoaded] = useState(0);
+
+  useEffect(() => {
+    let loadedCount = 0;
+    const onAssetLoad = () => {
+      loadedCount++;
+      setAssetsLoaded(loadedCount); // forza un re-render quando un'immagine è pronta
+    };
+
+    if (!playerImage.complete) playerImage.onload = onAssetLoad;
+    if (!backgroundImage.complete) backgroundImage.onload = onAssetLoad;
+  }, []);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -42,13 +58,20 @@ export function GameCanvas({
     // Pulisci
     ctx.clearRect(0, 0, width, height);
 
-    // Disegna il feed video (specchiato)
+    // Disegna lo sfondo far west
+    if (backgroundImage.complete) {
+      ctx.drawImage(backgroundImage, 0, 0, width, height);
+    }
+
+    // Disegna il feed video sopra, semi-trasparente (specchiato)
     const video = videoRef.current;
     if (video && video.readyState >= 2) {
       ctx.save();
+      ctx.globalAlpha = 0.7; // 0 = invisibile, 1 = opaco — regola a piacere
       ctx.scale(-1, 1);
       ctx.drawImage(video, -width, 0, width, height);
       ctx.restore();
+      ctx.globalAlpha = 1; // resetta per il resto del disegno
     }
 
     // Larghezza corsia
