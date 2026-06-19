@@ -12,7 +12,7 @@ import type { Pose } from '@tensorflow-models/pose-detection/dist/types';
 import './App.css';
 
 // Carica le immagini degli ostacoli una volta sola
-const OBSTACLE_KEYS = ['roccia.png', 'cactus.png', 'barile.png'];
+const OBSTACLE_KEYS = ['cespuglio.png', 'cactus.png', 'barile.png'];
 const obstacleImages: Record<string, HTMLImageElement> = {};
 OBSTACLE_KEYS.forEach(key => {
   const img = new Image();
@@ -78,7 +78,7 @@ export default function App() {
         <h1>Outlaw Run</h1>
       </header>
 
-      <p>Chi l'ha detto che la riabilitazione è solo noia? Metti in moto le gambe, schiva cactus, barili e rocce come un vero cowboy e trasforma la tua terapia nella sfida pixelata più divertente del West!</p>
+      <p>Chi l'ha detto che la riabilitazione è solo noia? Metti in moto le gambe, schiva cactus, barili e cespugli come un vero cowboy e trasforma la tua terapia nella sfida pixelata più divertente del West!</p>
 
       <div className="game-stats">
           <span>Punteggio: {state.score}</span>

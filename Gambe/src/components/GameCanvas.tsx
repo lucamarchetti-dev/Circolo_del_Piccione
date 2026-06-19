@@ -4,6 +4,9 @@ import type { Obstacle } from '../game/obstacle-spawner';
 import type { Lane } from '../game/lane-detector';
 import type { GameState } from '../hooks/useGameState';
 
+const playerImage = new Image();
+playerImage.src = '/player.png';
+
 const LANE_COLORS = {
   left:   'rgba(255,255,255,0.08)',
   center: 'rgba(255,255,255,0.08)',
@@ -70,27 +73,50 @@ export function GameCanvas({
     ctx.strokeRect(0, HIT_ZONE_Y, width, 80);
     ctx.setLineDash([]);
 
-    // Ostacoli
+    // Ostacoli (con effetto prospettiva: crescono avvicinandosi)
+    const MIN_SCALE = 0.3;   // dimensione quando sono lontani (in alto)
+    const MAX_SCALE = 1.4;   // dimensione quando sono vicini (in basso, oltre la hit zone)
+
     obstacles.forEach(obstacle => {
+      // progress: 0 = appena spawnato (in alto), 1 = arrivato alla hit zone
+      const progress = Math.min(Math.max(obstacle.y / HIT_ZONE_Y, 0), 1);
+      const scale = MIN_SCALE + (MAX_SCALE - MIN_SCALE) * progress;
+      const size = OBSTACLE_SIZE * scale;
+
       const laneIndex = lanes.indexOf(obstacle.lane);
-      const x = laneIndex * laneW + laneW / 2 - OBSTACLE_SIZE / 2;
+      const x = laneIndex * laneW + laneW / 2 - size / 2;
+      // centriamo anche verticalmente sul punto y originale
+      const y = obstacle.y - (size - OBSTACLE_SIZE) / 2;
+
       const img = obstacleImages[obstacle.imageKey];
       if (img) {
-        ctx.drawImage(img, x, obstacle.y, OBSTACLE_SIZE, OBSTACLE_SIZE);
+        ctx.drawImage(img, x, y, size, size);
       } else {
-        // Fallback se l'immagine non è caricata
         ctx.fillStyle = 'red';
-        ctx.fillRect(x, obstacle.y, OBSTACLE_SIZE, OBSTACLE_SIZE);
+        ctx.fillRect(x, y, size, size);
       }
     });
 
-    // Indicatore corsia giocatore (cerchio sopra la hit zone)
+    // Indicatore corsia giocatore (icona sopra la hit zone)
     const playerLaneIndex = lanes.indexOf(playerLane);
     const px = playerLaneIndex * laneW + laneW / 2;
-    ctx.beginPath();
-    ctx.arc(px, HIT_ZONE_Y - 20, 18, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(99,202,255,0.9)';
-    ctx.fill();
+    const PLAYER_SIZE = 140;
+
+    if (playerImage.complete) {
+      ctx.drawImage(
+        playerImage,
+        px - PLAYER_SIZE / 2,
+        HIT_ZONE_Y - 20 - PLAYER_SIZE / 2,
+        PLAYER_SIZE,
+        PLAYER_SIZE
+      );
+    } else {
+      // fallback mentre l'immagine carica
+      ctx.beginPath();
+      ctx.arc(px, HIT_ZONE_Y - 20, 18, 0, Math.PI * 2);
+      ctx.fillStyle = 'rgba(99,202,255,0.9)';
+      ctx.fill();
+    }
 
     // HUD — punteggio e vite
     ctx.fillStyle = 'white';
@@ -108,7 +134,7 @@ export function GameCanvas({
       ctx.textAlign = 'center';
 
       if (gameState.status === 'idle') {
-        ctx.fillText('GAMBE 🦵', width / 2, height / 2 - 20);
+        ctx.fillText('OUTLAW RUN', width / 2, height / 2 - 20);
         ctx.font = '18px monospace';
         ctx.fillText('Premi SPAZIO per iniziare', width / 2, height / 2 + 20);
       } else {

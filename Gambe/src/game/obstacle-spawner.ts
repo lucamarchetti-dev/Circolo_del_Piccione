@@ -8,7 +8,7 @@ export interface Obstacle {
   imageKey: string;
 }
 
-const OBSTACLE_IMAGES = ['roccia.png', 'cactus.png', 'barile.png'];
+const OBSTACLE_IMAGES = ['cespuglio.png', 'cactus.png', 'barile.png'];
 const LANES: ObstacleLane[] = ['left', 'center', 'right'];
 
 let nextId = 0;
