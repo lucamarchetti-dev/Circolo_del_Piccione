@@ -5,6 +5,11 @@ import * as poseDetection from '@tensorflow-models/pose-detection/dist/index.js'
 import { drawKeypoints, drawArm, getKeypoint } from '../pose-utils'; 
 import piccioneTerra from '../assets/png/piccione-terra.png';
 
+//immagine sfondo in caso game over
+import gameOverBg from "../assets/png/game-over.png";
+const gameOverImage = new Image();
+gameOverImage.src = gameOverBg;
+
 const VIDEO_WIDTH = 640;
 const VIDEO_HEIGHT = 480;
 const Pigeon_SIZE = 80;
@@ -296,16 +301,21 @@ function PigeonBlaster() {
       }
     }
 
-    drawTextUnflipped(`Punteggio: ${scoreRef.current}`, 30, 115, "bold 24px Arial", "white");
-    drawTextUnflipped(`Record: ${highScoreRef.current}`, 30, 150, "bold 20px Arial", "#FFD700");
+    drawTextUnflipped(`Punteggio: ${scoreRef.current}`, 30, 115, "bold 24px PPNeueBit", "white");
+    drawTextUnflipped(`Record: ${highScoreRef.current}`, 30, 150, "bold 20px PPNeueBit", "#FFD700");
 
     if (isGameOverRef.current) {
-      ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
-      ctx.fillRect(0, 0, VIDEO_WIDTH, VIDEO_HEIGHT);
+      ctx.drawImage(
+        gameOverImage,
+        0,
+        0,
+        VIDEO_WIDTH,
+        VIDEO_HEIGHT
+    );
 
-      drawTextUnflipped("HAI PERSO", VIDEO_WIDTH / 2, VIDEO_HEIGHT / 2 - 30, "bold 55px Arial", "#FF3333", "center");
-      drawTextUnflipped(`Picconi Presi: ${scoreRef.current}`, VIDEO_WIDTH / 2, VIDEO_HEIGHT / 2 + 20, "bold 24px Arial", "white", "center");
-      drawTextUnflipped(`Record Massimo: ${highScoreRef.current}`, VIDEO_WIDTH / 2, VIDEO_HEIGHT / 2 + 55, "bold 22px Arial", "#FFD700", "center");
+      drawTextUnflipped("HAI PERSO", VIDEO_WIDTH / 2, VIDEO_HEIGHT / 2 - 30, "bold 65px PPNeueBit", "#ffffff", "center");
+      drawTextUnflipped(`Piccioni Presi: ${scoreRef.current}`, VIDEO_WIDTH / 2, VIDEO_HEIGHT / 2 + 20, "bold 24px PPNeueBit", "white", "center");
+      drawTextUnflipped(`Record Massimo: ${highScoreRef.current}`, VIDEO_WIDTH / 2, VIDEO_HEIGHT / 2 + 55, "bold 22px PPNeueBit", "#FFD700", "center");
     }
 
     animationRef.current = requestAnimationFrame(loop);
@@ -346,74 +356,8 @@ function PigeonBlaster() {
     }
   }, [selectedDeviceId]);
 
-  // return (
-  //   <div style={{ textAlign: "center", fontFamily: "sans-serif", padding: "10px" }}>
-  //     <h2>Pigeon Blaster 🐦</h2>
-      
-  //     <div style={{ margin: "10px auto", display: "flex", justifyContent: "center", gap: "25px", fontSize: "18px" }}>
-  //       <span>Punteggio Corrente: <strong>{score}</strong></span>
-  //       <span>Vite: <strong>{lives}/3</strong></span>
-  //       <span>Record Attuale: <strong>{highScore}</strong></span>
-  //     </div>
-
-  //     <div style={{ marginBottom: "15px", display: "flex", justifyContent: "center", gap: "15px", alignItems: "center" }}>
-  //       <div>
-  //         <label htmlFor="camera-select" style={{ marginRight: "10px", fontWeight: "bold" }}>
-  //           Fotocamera: 
-  //         </label>
-  //         <select
-  //           id="camera-select"
-  //           value={selectedDeviceId}
-  //           onChange={(e) => setSelectedDeviceId(e.target.value)}
-  //           style={{ padding: "6px 12px", fontSize: "16px", borderRadius: "4px" }}
-  //         >
-  //           {devices.map((device) => (
-  //             <option key={device.deviceId} value={device.deviceId}>
-  //               {device.label || `Camera ${device.deviceId.slice(0, 5)}`}
-  //             </option>
-  //           ))}
-  //         </select>
-  //       </div>
-
-  //       {isGameOver && (
-  //         <button 
-  //           onClick={restartGame}
-  //           style={{
-  //             padding: "8px 16px",
-  //             fontSize: "16px",
-  //             fontWeight: "bold",
-  //             backgroundColor: "#FF3333",
-  //             color: "white",
-  //             border: "none",
-  //             borderRadius: "4px",
-  //             cursor: "pointer"
-  //           }}
-  //         >
-  //           Riprova 🔄
-  //         </button>
-  //       )}
-  //     </div>
-
-  //     <canvas
-  //       ref={canvasRef}
-  //       width={VIDEO_WIDTH}
-  //       height={VIDEO_HEIGHT}
-  //       style={{ 
-  //         border: "3px solid #333", 
-  //         borderRadius: "8px",
-  //         maxWidth: "100%", 
-  //         height: "auto",
-  //         transform: "scaleX(-1)" 
-  //       }}
-  //     />
-
-  //     <video ref={videoRef} style={{ display: "none" }} />
-  //   </div>
-  // );
-
   return (
     <div className="game-container">
-      {/* Header con Titoli e Piccioni Specchiati */}
       <div className="header-container">
         <img 
           src={piccioneTerra} 
@@ -462,7 +406,7 @@ function PigeonBlaster() {
 
         {isGameOver && (
           <button onClick={restartGame} className="btn-retry">
-            Riprova 🔄
+            Riprova
           </button>
         )}
       </div>
