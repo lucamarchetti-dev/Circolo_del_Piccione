@@ -1,0 +1,39 @@
+/**
+ * @license
+ * Copyright 2021 Google LLC. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the License);
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an AS IS BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * =============================================================================
+ */
+import { ExpandDims, util } from '@tensorflow/tfjs-core';
+import { reshape } from './Reshape';
+export function expandDims(args) {
+    const { inputs, attrs, backend } = args;
+    const { dim } = attrs;
+    const { input } = inputs;
+    const inputRank = input.shape.length;
+    const newShape = input.shape.slice();
+    let $dim = dim;
+    if (dim < 0) {
+        // Negative value is counted from the tail of rank.
+        util.assert(-(inputRank + 1) <= dim, () => `Axis must be in the interval [${-(inputRank + 1)}, ${inputRank}]`);
+        $dim = inputRank + dim + 1;
+    }
+    newShape.splice($dim, 0, 1);
+    return reshape({ inputs: { x: input }, backend, attrs: { shape: newShape } });
+}
+export const expandDimsConfig = {
+    kernelName: ExpandDims,
+    backendName: 'webgpu',
+    kernelFunc: expandDims,
+};
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiRXhwYW5kRGltcy5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uLy4uLy4uLy4uLy4uL3RmanMtYmFja2VuZC13ZWJncHUvc3JjL2tlcm5lbHMvRXhwYW5kRGltcy50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTs7Ozs7Ozs7Ozs7Ozs7O0dBZUc7QUFFSCxPQUFPLEVBQUMsVUFBVSxFQUEyRSxJQUFJLEVBQUMsTUFBTSx1QkFBdUIsQ0FBQztBQUdoSSxPQUFPLEVBQUMsT0FBTyxFQUFDLE1BQU0sV0FBVyxDQUFDO0FBRWxDLE1BQU0sVUFBVSxVQUFVLENBQUMsSUFJMUI7SUFDQyxNQUFNLEVBQUMsTUFBTSxFQUFFLEtBQUssRUFBRSxPQUFPLEVBQUMsR0FBRyxJQUFJLENBQUM7SUFDdEMsTUFBTSxFQUFDLEdBQUcsRUFBQyxHQUFHLEtBQUssQ0FBQztJQUNwQixNQUFNLEVBQUMsS0FBSyxFQUFDLEdBQUcsTUFBTSxDQUFDO0lBRXZCLE1BQU0sU0FBUyxHQUFHLEtBQUssQ0FBQyxLQUFLLENBQUMsTUFBTSxDQUFDO0lBQ3JDLE1BQU0sUUFBUSxHQUFHLEtBQUssQ0FBQyxLQUFLLENBQUMsS0FBSyxFQUFFLENBQUM7SUFDckMsSUFBSSxJQUFJLEdBQUcsR0FBRyxDQUFDO0lBQ2YsSUFBSSxHQUFHLEdBQUcsQ0FBQyxFQUFFO1FBQ1gsbURBQW1EO1FBQ25ELElBQUksQ0FBQyxNQUFNLENBQ1AsQ0FBQyxDQUFDLFNBQVMsR0FBRyxDQUFDLENBQUMsSUFBSSxHQUFHLEVBQ3ZCLEdBQUcsRUFBRSxDQUFDLGlDQUFpQyxDQUFFLENBQUMsU0FBUyxHQUFHLENBQUMsQ0FBQyxLQUNwRCxTQUFTLEdBQUcsQ0FBQyxDQUFDO1FBQ3RCLElBQUksR0FBRyxTQUFTLEdBQUcsR0FBRyxHQUFHLENBQUMsQ0FBQztLQUM1QjtJQUNELFFBQVEsQ0FBQyxNQUFNLENBQUMsSUFBSSxFQUFFLENBQUMsRUFBRSxDQUFDLENBQUMsQ0FBQztJQUU1QixPQUFPLE9BQU8sQ0FBQyxFQUFDLE1BQU0sRUFBRSxFQUFDLENBQUMsRUFBRSxLQUFLLEVBQUMsRUFBRSxPQUFPLEVBQUUsS0FBSyxFQUFFLEVBQUMsS0FBSyxFQUFFLFFBQVEsRUFBQyxFQUFDLENBQUMsQ0FBQztBQUMxRSxDQUFDO0FBRUQsTUFBTSxDQUFDLE1BQU0sZ0JBQWdCLEdBQWlCO0lBQzVDLFVBQVUsRUFBRSxVQUFVO0lBQ3RCLFdBQVcsRUFBRSxRQUFRO0lBQ3JCLFVBQVUsRUFBRSxVQUFtQztDQUNoRCxDQUFDIiwic291cmNlc0NvbnRlbnQiOlsiLyoqXG4gKiBAbGljZW5zZVxuICogQ29weXJpZ2h0IDIwMjEgR29vZ2xlIExMQy4gQWxsIFJpZ2h0cyBSZXNlcnZlZC5cbiAqIExpY2Vuc2VkIHVuZGVyIHRoZSBBcGFjaGUgTGljZW5zZSwgVmVyc2lvbiAyLjAgKHRoZSBMaWNlbnNlKTtcbiAqIHlvdSBtYXkgbm90IHVzZSB0aGlzIGZpbGUgZXhjZXB0IGluIGNvbXBsaWFuY2Ugd2l0aCB0aGUgTGljZW5zZS5cbiAqIFlvdSBtYXkgb2J0YWluIGEgY29weSBvZiB0aGUgTGljZW5zZSBhdFxuICpcbiAqIGh0dHA6Ly93d3cuYXBhY2hlLm9yZy9saWNlbnNlcy9MSUNFTlNFLTIuMFxuICpcbiAqIFVubGVzcyByZXF1aXJlZCBieSBhcHBsaWNhYmxlIGxhdyBvciBhZ3JlZWQgdG8gaW4gd3JpdGluZywgc29mdHdhcmVcbiAqIGRpc3RyaWJ1dGVkIHVuZGVyIHRoZSBMaWNlbnNlIGlzIGRpc3RyaWJ1dGVkIG9uIGFuIEFTIElTIEJBU0lTLFxuICogV0lUSE9VVCBXQVJSQU5USUVTIE9SIENPTkRJVElPTlMgT0YgQU5ZIEtJTkQsIGVpdGhlciBleHByZXNzIG9yIGltcGxpZWQuXG4gKiBTZWUgdGhlIExpY2Vuc2UgZm9yIHRoZSBzcGVjaWZpYyBsYW5ndWFnZSBnb3Zlcm5pbmcgcGVybWlzc2lvbnMgYW5kXG4gKiBsaW1pdGF0aW9ucyB1bmRlciB0aGUgTGljZW5zZS5cbiAqID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09XG4gKi9cblxuaW1wb3J0IHtFeHBhbmREaW1zLCBFeHBhbmREaW1zQXR0cnMsIEV4cGFuZERpbXNJbnB1dHMsIEtlcm5lbENvbmZpZywgS2VybmVsRnVuYywgVGVuc29ySW5mbywgdXRpbH0gZnJvbSAnQHRlbnNvcmZsb3cvdGZqcy1jb3JlJztcblxuaW1wb3J0IHtXZWJHUFVCYWNrZW5kfSBmcm9tICcuLi9iYWNrZW5kX3dlYmdwdSc7XG5pbXBvcnQge3Jlc2hhcGV9IGZyb20gJy4vUmVzaGFwZSc7XG5cbmV4cG9ydCBmdW5jdGlvbiBleHBhbmREaW1zKGFyZ3M6IHtcbiAgaW5wdXRzOiBFeHBhbmREaW1zSW5wdXRzLFxuICBhdHRyczogRXhwYW5kRGltc0F0dHJzLFxuICBiYWNrZW5kOiBXZWJHUFVCYWNrZW5kXG59KTogVGVuc29ySW5mbyB7XG4gIGNvbnN0IHtpbnB1dHMsIGF0dHJzLCBiYWNrZW5kfSA9IGFyZ3M7XG4gIGNvbnN0IHtkaW19ID0gYXR0cnM7XG4gIGNvbnN0IHtpbnB1dH0gPSBpbnB1dHM7XG5cbiAgY29uc3QgaW5wdXRSYW5rID0gaW5wdXQuc2hhcGUubGVuZ3RoO1xuICBjb25zdCBuZXdTaGFwZSA9IGlucHV0LnNoYXBlLnNsaWNlKCk7XG4gIGxldCAkZGltID0gZGltO1xuICBpZiAoZGltIDwgMCkge1xuICAgIC8vIE5lZ2F0aXZlIHZhbHVlIGlzIGNvdW50ZWQgZnJvbSB0aGUgdGFpbCBvZiByYW5rLlxuICAgIHV0aWwuYXNzZXJ0KFxuICAgICAgICAtKGlucHV0UmFuayArIDEpIDw9IGRpbSxcbiAgICAgICAgKCkgPT4gYEF4aXMgbXVzdCBiZSBpbiB0aGUgaW50ZXJ2YWwgWyR7LSAoaW5wdXRSYW5rICsgMSl9LCAke1xuICAgICAgICAgICAgaW5wdXRSYW5rfV1gKTtcbiAgICAkZGltID0gaW5wdXRSYW5rICsgZGltICsgMTtcbiAgfVxuICBuZXdTaGFwZS5zcGxpY2UoJGRpbSwgMCwgMSk7XG5cbiAgcmV0dXJuIHJlc2hhcGUoe2lucHV0czoge3g6IGlucHV0fSwgYmFja2VuZCwgYXR0cnM6IHtzaGFwZTogbmV3U2hhcGV9fSk7XG59XG5cbmV4cG9ydCBjb25zdCBleHBhbmREaW1zQ29uZmlnOiBLZXJuZWxDb25maWcgPSB7XG4gIGtlcm5lbE5hbWU6IEV4cGFuZERpbXMsXG4gIGJhY2tlbmROYW1lOiAnd2ViZ3B1JyxcbiAga2VybmVsRnVuYzogZXhwYW5kRGltcyBhcyB1bmtub3duIGFzIEtlcm5lbEZ1bmMsXG59O1xuIl19
