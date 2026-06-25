@@ -1,0 +1,42 @@
+/**
+ * @license
+ * Copyright 2023 Google LLC.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * =============================================================================
+ */
+import { Multinomial } from '@tensorflow/tfjs-core';
+import { MultinomialProgram } from '../multinomial_webgpu';
+import { softmax } from './Softmax';
+export function multinomial(args) {
+    const { inputs, backend, attrs } = args;
+    const { logits } = inputs;
+    const { numSamples, seed, normalized } = attrs;
+    const probs = normalized ?
+        logits :
+        softmax({ inputs: { logits }, backend, attrs: { dim: logits.shape.length - 1 } });
+    const batchSize = probs.shape[0];
+    const numOutcomes = probs.shape[1];
+    const program = new MultinomialProgram(batchSize, numSamples);
+    const uniformData = [{ type: 'float32', data: [seed] }, { type: 'int32', data: [numOutcomes] }];
+    const res = backend.runWebGPUProgram(program, [probs], 'int32', uniformData);
+    if (!normalized) {
+        backend.disposeData(probs.dataId);
+    }
+    return res;
+}
+export const multinomialConfig = {
+    kernelName: Multinomial,
+    backendName: 'webgpu',
+    kernelFunc: multinomial
+};
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiTXVsdGlub21pYWwuanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi8uLi8uLi8uLi90ZmpzLWJhY2tlbmQtd2ViZ3B1L3NyYy9rZXJuZWxzL011bHRpbm9taWFsLnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBOzs7Ozs7Ozs7Ozs7Ozs7R0FlRztBQUVILE9BQU8sRUFBMkIsV0FBVyxFQUFrRCxNQUFNLHVCQUF1QixDQUFDO0FBRzdILE9BQU8sRUFBQyxrQkFBa0IsRUFBQyxNQUFNLHVCQUF1QixDQUFDO0FBRXpELE9BQU8sRUFBQyxPQUFPLEVBQUMsTUFBTSxXQUFXLENBQUM7QUFFbEMsTUFBTSxVQUFVLFdBQVcsQ0FBQyxJQUkzQjtJQUNDLE1BQU0sRUFBQyxNQUFNLEVBQUUsT0FBTyxFQUFFLEtBQUssRUFBQyxHQUFHLElBQUksQ0FBQztJQUN0QyxNQUFNLEVBQUMsTUFBTSxFQUFDLEdBQUcsTUFBTSxDQUFDO0lBQ3hCLE1BQU0sRUFBQyxVQUFVLEVBQUUsSUFBSSxFQUFFLFVBQVUsRUFBQyxHQUFHLEtBQUssQ0FBQztJQUU3QyxNQUFNLEtBQUssR0FBRyxVQUFVLENBQUMsQ0FBQztRQUN0QixNQUFNLENBQUMsQ0FBQztRQUNSLE9BQU8sQ0FDSCxFQUFDLE1BQU0sRUFBRSxFQUFDLE1BQU0sRUFBQyxFQUFFLE9BQU8sRUFBRSxLQUFLLEVBQUUsRUFBQyxHQUFHLEVBQUUsTUFBTSxDQUFDLEtBQUssQ0FBQyxNQUFNLEdBQUcsQ0FBQyxFQUFDLEVBQUMsQ0FBQyxDQUFDO0lBQzVFLE1BQU0sU0FBUyxHQUFHLEtBQUssQ0FBQyxLQUFLLENBQUMsQ0FBQyxDQUFDLENBQUM7SUFDakMsTUFBTSxXQUFXLEdBQUcsS0FBSyxDQUFDLEtBQUssQ0FBQyxDQUFDLENBQUMsQ0FBQztJQUNuQyxNQUFNLE9BQU8sR0FBRyxJQUFJLGtCQUFrQixDQUFDLFNBQVMsRUFBRSxVQUFVLENBQUMsQ0FBQztJQUM5RCxNQUFNLFdBQVcsR0FDYixDQUFDLEVBQUMsSUFBSSxFQUFFLFNBQVMsRUFBRSxJQUFJLEVBQUUsQ0FBQyxJQUFJLENBQUMsRUFBQyxFQUFFLEVBQUMsSUFBSSxFQUFFLE9BQU8sRUFBRSxJQUFJLEVBQUUsQ0FBQyxXQUFXLENBQUMsRUFBQyxDQUFDLENBQUM7SUFDNUUsTUFBTSxHQUFHLEdBQUcsT0FBTyxDQUFDLGdCQUFnQixDQUFDLE9BQU8sRUFBRSxDQUFDLEtBQUssQ0FBQyxFQUFFLE9BQU8sRUFBRSxXQUFXLENBQUMsQ0FBQztJQUM3RSxJQUFJLENBQUMsVUFBVSxFQUFFO1FBQ2YsT0FBTyxDQUFDLFdBQVcsQ0FBQyxLQUFLLENBQUMsTUFBTSxDQUFDLENBQUM7S0FDbkM7SUFDRCxPQUFPLEdBQUcsQ0FBQztBQUNiLENBQUM7QUFFRCxNQUFNLENBQUMsTUFBTSxpQkFBaUIsR0FBaUI7SUFDN0MsVUFBVSxFQUFFLFdBQVc7SUFDdkIsV0FBVyxFQUFFLFFBQVE7SUFDckIsVUFBVSxFQUFFLFdBQW9DO0NBQ2pELENBQUMiLCJzb3VyY2VzQ29udGVudCI6WyIvKipcbiAqIEBsaWNlbnNlXG4gKiBDb3B5cmlnaHQgMjAyMyBHb29nbGUgTExDLlxuICogTGljZW5zZWQgdW5kZXIgdGhlIEFwYWNoZSBMaWNlbnNlLCBWZXJzaW9uIDIuMCAodGhlIFwiTGljZW5zZVwiKTtcbiAqIHlvdSBtYXkgbm90IHVzZSB0aGlzIGZpbGUgZXhjZXB0IGluIGNvbXBsaWFuY2Ugd2l0aCB0aGUgTGljZW5zZS5cbiAqIFlvdSBtYXkgb2J0YWluIGEgY29weSBvZiB0aGUgTGljZW5zZSBhdFxuICpcbiAqIGh0dHA6Ly93d3cuYXBhY2hlLm9yZy9saWNlbnNlcy9MSUNFTlNFLTIuMFxuICpcbiAqIFVubGVzcyByZXF1aXJlZCBieSBhcHBsaWNhYmxlIGxhdyBvciBhZ3JlZWQgdG8gaW4gd3JpdGluZywgc29mdHdhcmVcbiAqIGRpc3RyaWJ1dGVkIHVuZGVyIHRoZSBMaWNlbnNlIGlzIGRpc3RyaWJ1dGVkIG9uIGFuIFwiQVMgSVNcIiBCQVNJUyxcbiAqIFdJVEhPVVQgV0FSUkFOVElFUyBPUiBDT05ESVRJT05TIE9GIEFOWSBLSU5ELCBlaXRoZXIgZXhwcmVzcyBvciBpbXBsaWVkLlxuICogU2VlIHRoZSBMaWNlbnNlIGZvciB0aGUgc3BlY2lmaWMgbGFuZ3VhZ2UgZ292ZXJuaW5nIHBlcm1pc3Npb25zIGFuZFxuICogbGltaXRhdGlvbnMgdW5kZXIgdGhlIExpY2Vuc2UuXG4gKiA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PVxuICovXG5cbmltcG9ydCB7S2VybmVsQ29uZmlnLCBLZXJuZWxGdW5jLCBNdWx0aW5vbWlhbCwgTXVsdGlub21pYWxBdHRycywgTXVsdGlub21pYWxJbnB1dHMsIFRlbnNvckluZm99IGZyb20gJ0B0ZW5zb3JmbG93L3RmanMtY29yZSc7XG5cbmltcG9ydCB7V2ViR1BVQmFja2VuZH0gZnJvbSAnLi4vYmFja2VuZF93ZWJncHUnO1xuaW1wb3J0IHtNdWx0aW5vbWlhbFByb2dyYW19IGZyb20gJy4uL211bHRpbm9taWFsX3dlYmdwdSc7XG5cbmltcG9ydCB7c29mdG1heH0gZnJvbSAnLi9Tb2Z0bWF4JztcblxuZXhwb3J0IGZ1bmN0aW9uIG11bHRpbm9taWFsKGFyZ3M6IHtcbiAgaW5wdXRzOiBNdWx0aW5vbWlhbElucHV0cyxcbiAgYmFja2VuZDogV2ViR1BVQmFja2VuZCxcbiAgYXR0cnM6IE11bHRpbm9taWFsQXR0cnNcbn0pOiBUZW5zb3JJbmZvIHtcbiAgY29uc3Qge2lucHV0cywgYmFja2VuZCwgYXR0cnN9ID0gYXJncztcbiAgY29uc3Qge2xvZ2l0c30gPSBpbnB1dHM7XG4gIGNvbnN0IHtudW1TYW1wbGVzLCBzZWVkLCBub3JtYWxpemVkfSA9IGF0dHJzO1xuXG4gIGNvbnN0IHByb2JzID0gbm9ybWFsaXplZCA/XG4gICAgICBsb2dpdHMgOlxuICAgICAgc29mdG1heChcbiAgICAgICAgICB7aW5wdXRzOiB7bG9naXRzfSwgYmFja2VuZCwgYXR0cnM6IHtkaW06IGxvZ2l0cy5zaGFwZS5sZW5ndGggLSAxfX0pO1xuICBjb25zdCBiYXRjaFNpemUgPSBwcm9icy5zaGFwZVswXTtcbiAgY29uc3QgbnVtT3V0Y29tZXMgPSBwcm9icy5zaGFwZVsxXTtcbiAgY29uc3QgcHJvZ3JhbSA9IG5ldyBNdWx0aW5vbWlhbFByb2dyYW0oYmF0Y2hTaXplLCBudW1TYW1wbGVzKTtcbiAgY29uc3QgdW5pZm9ybURhdGEgPVxuICAgICAgW3t0eXBlOiAnZmxvYXQzMicsIGRhdGE6IFtzZWVkXX0sIHt0eXBlOiAnaW50MzInLCBkYXRhOiBbbnVtT3V0Y29tZXNdfV07XG4gIGNvbnN0IHJlcyA9IGJhY2tlbmQucnVuV2ViR1BVUHJvZ3JhbShwcm9ncmFtLCBbcHJvYnNdLCAnaW50MzInLCB1bmlmb3JtRGF0YSk7XG4gIGlmICghbm9ybWFsaXplZCkge1xuICAgIGJhY2tlbmQuZGlzcG9zZURhdGEocHJvYnMuZGF0YUlkKTtcbiAgfVxuICByZXR1cm4gcmVzO1xufVxuXG5leHBvcnQgY29uc3QgbXVsdGlub21pYWxDb25maWc6IEtlcm5lbENvbmZpZyA9IHtcbiAga2VybmVsTmFtZTogTXVsdGlub21pYWwsXG4gIGJhY2tlbmROYW1lOiAnd2ViZ3B1JyxcbiAga2VybmVsRnVuYzogbXVsdGlub21pYWwgYXMgdW5rbm93biBhcyBLZXJuZWxGdW5jXG59O1xuIl19

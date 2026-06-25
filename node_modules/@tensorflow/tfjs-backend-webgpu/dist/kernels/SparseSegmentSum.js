@@ -1,0 +1,29 @@
+/**
+ * @license
+ * Copyright 2023 Google LLC.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * =============================================================================
+ */
+import { SparseSegmentSum } from '@tensorflow/tfjs-core';
+import { sparseSegmentReduce } from '../kernel_utils/sparse_segment_reduce';
+export function sparseSegmentSum(args) {
+    const { inputs, backend } = args;
+    const { data, indices, segmentIds } = inputs;
+    return sparseSegmentReduce(data, indices, segmentIds, true, backend);
+}
+export const sparseSegmentSumConfig = {
+    kernelName: SparseSegmentSum,
+    backendName: 'webgpu',
+    kernelFunc: sparseSegmentSum,
+};
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiU3BhcnNlU2VnbWVudFN1bS5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uLy4uLy4uLy4uLy4uL3RmanMtYmFja2VuZC13ZWJncHUvc3JjL2tlcm5lbHMvU3BhcnNlU2VnbWVudFN1bS50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTs7Ozs7Ozs7Ozs7Ozs7O0dBZUc7QUFFSCxPQUFPLEVBQTJCLGdCQUFnQixFQUFxQyxNQUFNLHVCQUF1QixDQUFDO0FBR3JILE9BQU8sRUFBQyxtQkFBbUIsRUFBQyxNQUFNLHVDQUF1QyxDQUFDO0FBRTFFLE1BQU0sVUFBVSxnQkFBZ0IsQ0FDNUIsSUFBOEQ7SUFFaEUsTUFBTSxFQUFDLE1BQU0sRUFBRSxPQUFPLEVBQUMsR0FBRyxJQUFJLENBQUM7SUFDL0IsTUFBTSxFQUFDLElBQUksRUFBRSxPQUFPLEVBQUUsVUFBVSxFQUFDLEdBQUcsTUFBTSxDQUFDO0lBRTNDLE9BQU8sbUJBQW1CLENBQUMsSUFBSSxFQUFFLE9BQU8sRUFBRSxVQUFVLEVBQUUsSUFBSSxFQUFFLE9BQU8sQ0FBQyxDQUFDO0FBQ3ZFLENBQUM7QUFFRCxNQUFNLENBQUMsTUFBTSxzQkFBc0IsR0FBaUI7SUFDbEQsVUFBVSxFQUFFLGdCQUFnQjtJQUM1QixXQUFXLEVBQUUsUUFBUTtJQUNyQixVQUFVLEVBQUUsZ0JBQXlDO0NBQ3RELENBQUMiLCJzb3VyY2VzQ29udGVudCI6WyIvKipcbiAqIEBsaWNlbnNlXG4gKiBDb3B5cmlnaHQgMjAyMyBHb29nbGUgTExDLlxuICogTGljZW5zZWQgdW5kZXIgdGhlIEFwYWNoZSBMaWNlbnNlLCBWZXJzaW9uIDIuMCAodGhlIFwiTGljZW5zZVwiKTtcbiAqIHlvdSBtYXkgbm90IHVzZSB0aGlzIGZpbGUgZXhjZXB0IGluIGNvbXBsaWFuY2Ugd2l0aCB0aGUgTGljZW5zZS5cbiAqIFlvdSBtYXkgb2J0YWluIGEgY29weSBvZiB0aGUgTGljZW5zZSBhdFxuICpcbiAqIGh0dHA6Ly93d3cuYXBhY2hlLm9yZy9saWNlbnNlcy9MSUNFTlNFLTIuMFxuICpcbiAqIFVubGVzcyByZXF1aXJlZCBieSBhcHBsaWNhYmxlIGxhdyBvciBhZ3JlZWQgdG8gaW4gd3JpdGluZywgc29mdHdhcmVcbiAqIGRpc3RyaWJ1dGVkIHVuZGVyIHRoZSBMaWNlbnNlIGlzIGRpc3RyaWJ1dGVkIG9uIGFuIFwiQVMgSVNcIiBCQVNJUyxcbiAqIFdJVEhPVVQgV0FSUkFOVElFUyBPUiBDT05ESVRJT05TIE9GIEFOWSBLSU5ELCBlaXRoZXIgZXhwcmVzcyBvciBpbXBsaWVkLlxuICogU2VlIHRoZSBMaWNlbnNlIGZvciB0aGUgc3BlY2lmaWMgbGFuZ3VhZ2UgZ292ZXJuaW5nIHBlcm1pc3Npb25zIGFuZFxuICogbGltaXRhdGlvbnMgdW5kZXIgdGhlIExpY2Vuc2UuXG4gKiA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PVxuICovXG5cbmltcG9ydCB7S2VybmVsQ29uZmlnLCBLZXJuZWxGdW5jLCBTcGFyc2VTZWdtZW50U3VtLCBTcGFyc2VTZWdtZW50U3VtSW5wdXRzLCBUZW5zb3JJbmZvfSBmcm9tICdAdGVuc29yZmxvdy90ZmpzLWNvcmUnO1xuXG5pbXBvcnQge1dlYkdQVUJhY2tlbmR9IGZyb20gJy4uL2JhY2tlbmRfd2ViZ3B1JztcbmltcG9ydCB7c3BhcnNlU2VnbWVudFJlZHVjZX0gZnJvbSAnLi4va2VybmVsX3V0aWxzL3NwYXJzZV9zZWdtZW50X3JlZHVjZSc7XG5cbmV4cG9ydCBmdW5jdGlvbiBzcGFyc2VTZWdtZW50U3VtKFxuICAgIGFyZ3M6IHtpbnB1dHM6IFNwYXJzZVNlZ21lbnRTdW1JbnB1dHMsIGJhY2tlbmQ6IFdlYkdQVUJhY2tlbmR9KTpcbiAgICBUZW5zb3JJbmZvIHtcbiAgY29uc3Qge2lucHV0cywgYmFja2VuZH0gPSBhcmdzO1xuICBjb25zdCB7ZGF0YSwgaW5kaWNlcywgc2VnbWVudElkc30gPSBpbnB1dHM7XG5cbiAgcmV0dXJuIHNwYXJzZVNlZ21lbnRSZWR1Y2UoZGF0YSwgaW5kaWNlcywgc2VnbWVudElkcywgdHJ1ZSwgYmFja2VuZCk7XG59XG5cbmV4cG9ydCBjb25zdCBzcGFyc2VTZWdtZW50U3VtQ29uZmlnOiBLZXJuZWxDb25maWcgPSB7XG4gIGtlcm5lbE5hbWU6IFNwYXJzZVNlZ21lbnRTdW0sXG4gIGJhY2tlbmROYW1lOiAnd2ViZ3B1JyxcbiAga2VybmVsRnVuYzogc3BhcnNlU2VnbWVudFN1bSBhcyB1bmtub3duIGFzIEtlcm5lbEZ1bmMsXG59O1xuIl19

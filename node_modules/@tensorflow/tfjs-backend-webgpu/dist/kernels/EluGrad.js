@@ -1,0 +1,31 @@
+/**
+ * @license
+ * Copyright 2023 Google LLC.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * =============================================================================
+ */
+import { EluGrad } from '@tensorflow/tfjs-core';
+import { BinaryOpType } from '../binary_op_util';
+import { BinaryOpProgram } from '../binary_op_webgpu';
+export const eluGrad = (args) => {
+    const { inputs, backend } = args;
+    const { dy, y } = inputs;
+    const program = new BinaryOpProgram(BinaryOpType.ELU_DER, dy.shape, y.shape);
+    return backend.runWebGPUProgram(program, [dy, y], dy.dtype);
+};
+export const eluGradConfig = {
+    kernelName: EluGrad,
+    backendName: 'webgpu',
+    kernelFunc: eluGrad
+};
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiRWx1R3JhZC5qcyIsInNvdXJjZVJvb3QiOiIiLCJzb3VyY2VzIjpbIi4uLy4uLy4uLy4uLy4uLy4uL3RmanMtYmFja2VuZC13ZWJncHUvc3JjL2tlcm5lbHMvRWx1R3JhZC50cyJdLCJuYW1lcyI6W10sIm1hcHBpbmdzIjoiQUFBQTs7Ozs7Ozs7Ozs7Ozs7O0dBZUc7QUFFSCxPQUFPLEVBQUMsT0FBTyxFQUFzRCxNQUFNLHVCQUF1QixDQUFDO0FBR25HLE9BQU8sRUFBQyxZQUFZLEVBQUMsTUFBTSxtQkFBbUIsQ0FBQztBQUMvQyxPQUFPLEVBQUMsZUFBZSxFQUFDLE1BQU0scUJBQXFCLENBQUM7QUFFcEQsTUFBTSxDQUFDLE1BQU0sT0FBTyxHQUNoQixDQUFDLElBQXFELEVBQWMsRUFBRTtJQUNwRSxNQUFNLEVBQUMsTUFBTSxFQUFFLE9BQU8sRUFBQyxHQUFHLElBQUksQ0FBQztJQUMvQixNQUFNLEVBQUMsRUFBRSxFQUFFLENBQUMsRUFBQyxHQUFHLE1BQU0sQ0FBQztJQUV2QixNQUFNLE9BQU8sR0FDVCxJQUFJLGVBQWUsQ0FBQyxZQUFZLENBQUMsT0FBTyxFQUFFLEVBQUUsQ0FBQyxLQUFLLEVBQUUsQ0FBQyxDQUFDLEtBQUssQ0FBQyxDQUFDO0lBQ2pFLE9BQU8sT0FBTyxDQUFDLGdCQUFnQixDQUFDLE9BQU8sRUFBRSxDQUFDLEVBQUUsRUFBRSxDQUFDLENBQUMsRUFBRSxFQUFFLENBQUMsS0FBSyxDQUFDLENBQUM7QUFDOUQsQ0FBQyxDQUFDO0FBRU4sTUFBTSxDQUFDLE1BQU0sYUFBYSxHQUFpQjtJQUN6QyxVQUFVLEVBQUUsT0FBTztJQUNuQixXQUFXLEVBQUUsUUFBUTtJQUNyQixVQUFVLEVBQUUsT0FBZ0M7Q0FDN0MsQ0FBQyIsInNvdXJjZXNDb250ZW50IjpbIi8qKlxuICogQGxpY2Vuc2VcbiAqIENvcHlyaWdodCAyMDIzIEdvb2dsZSBMTEMuXG4gKiBMaWNlbnNlZCB1bmRlciB0aGUgQXBhY2hlIExpY2Vuc2UsIFZlcnNpb24gMi4wICh0aGUgXCJMaWNlbnNlXCIpO1xuICogeW91IG1heSBub3QgdXNlIHRoaXMgZmlsZSBleGNlcHQgaW4gY29tcGxpYW5jZSB3aXRoIHRoZSBMaWNlbnNlLlxuICogWW91IG1heSBvYnRhaW4gYSBjb3B5IG9mIHRoZSBMaWNlbnNlIGF0XG4gKlxuICogaHR0cDovL3d3dy5hcGFjaGUub3JnL2xpY2Vuc2VzL0xJQ0VOU0UtMi4wXG4gKlxuICogVW5sZXNzIHJlcXVpcmVkIGJ5IGFwcGxpY2FibGUgbGF3IG9yIGFncmVlZCB0byBpbiB3cml0aW5nLCBzb2Z0d2FyZVxuICogZGlzdHJpYnV0ZWQgdW5kZXIgdGhlIExpY2Vuc2UgaXMgZGlzdHJpYnV0ZWQgb24gYW4gXCJBUyBJU1wiIEJBU0lTLFxuICogV0lUSE9VVCBXQVJSQU5USUVTIE9SIENPTkRJVElPTlMgT0YgQU5ZIEtJTkQsIGVpdGhlciBleHByZXNzIG9yIGltcGxpZWQuXG4gKiBTZWUgdGhlIExpY2Vuc2UgZm9yIHRoZSBzcGVjaWZpYyBsYW5ndWFnZSBnb3Zlcm5pbmcgcGVybWlzc2lvbnMgYW5kXG4gKiBsaW1pdGF0aW9ucyB1bmRlciB0aGUgTGljZW5zZS5cbiAqID09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09XG4gKi9cblxuaW1wb3J0IHtFbHVHcmFkLCBFbHVHcmFkSW5wdXRzLCBLZXJuZWxDb25maWcsIEtlcm5lbEZ1bmMsIFRlbnNvckluZm99IGZyb20gJ0B0ZW5zb3JmbG93L3RmanMtY29yZSc7XG5cbmltcG9ydCB7V2ViR1BVQmFja2VuZH0gZnJvbSAnLi4vYmFja2VuZF93ZWJncHUnO1xuaW1wb3J0IHtCaW5hcnlPcFR5cGV9IGZyb20gJy4uL2JpbmFyeV9vcF91dGlsJztcbmltcG9ydCB7QmluYXJ5T3BQcm9ncmFtfSBmcm9tICcuLi9iaW5hcnlfb3Bfd2ViZ3B1JztcblxuZXhwb3J0IGNvbnN0IGVsdUdyYWQgPVxuICAgIChhcmdzOiB7aW5wdXRzOiBFbHVHcmFkSW5wdXRzLCBiYWNrZW5kOiBXZWJHUFVCYWNrZW5kfSk6IFRlbnNvckluZm8gPT4ge1xuICAgICAgY29uc3Qge2lucHV0cywgYmFja2VuZH0gPSBhcmdzO1xuICAgICAgY29uc3Qge2R5LCB5fSA9IGlucHV0cztcblxuICAgICAgY29uc3QgcHJvZ3JhbSA9XG4gICAgICAgICAgbmV3IEJpbmFyeU9wUHJvZ3JhbShCaW5hcnlPcFR5cGUuRUxVX0RFUiwgZHkuc2hhcGUsIHkuc2hhcGUpO1xuICAgICAgcmV0dXJuIGJhY2tlbmQucnVuV2ViR1BVUHJvZ3JhbShwcm9ncmFtLCBbZHksIHldLCBkeS5kdHlwZSk7XG4gICAgfTtcblxuZXhwb3J0IGNvbnN0IGVsdUdyYWRDb25maWc6IEtlcm5lbENvbmZpZyA9IHtcbiAga2VybmVsTmFtZTogRWx1R3JhZCxcbiAgYmFja2VuZE5hbWU6ICd3ZWJncHUnLFxuICBrZXJuZWxGdW5jOiBlbHVHcmFkIGFzIHVua25vd24gYXMgS2VybmVsRnVuY1xufTtcbiJdfQ==

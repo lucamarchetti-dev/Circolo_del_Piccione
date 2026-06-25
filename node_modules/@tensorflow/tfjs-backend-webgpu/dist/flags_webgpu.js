@@ -1,0 +1,80 @@
+/**
+ * @license
+ * Copyright 2019 Google LLC. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * =============================================================================
+ */
+import { env } from '@tensorflow/tfjs-core';
+const ENV = env();
+/** The batched dispatching calls size in the device queue. */
+ENV.registerFlag('WEBGPU_DEFERRED_SUBMIT_BATCH_SIZE', () => 15);
+/**
+ * Whether we forward execution to the CPU backend if tensors are small and
+ * reside on the CPU.
+ */
+ENV.registerFlag('WEBGPU_CPU_FORWARD', () => true);
+/**
+ * This flag is used to test different types of matmul programs.
+ *
+ * See MatMulProgramType in webgpu_util.ts for a list of available values.
+ */
+ENV.registerFlag('WEBGPU_MATMUL_PROGRAM_TYPE', () => -1);
+/**
+ * Whether to use conv2dTranspose_naive which directly implement the
+ * conv2dTranspose logic rather than using a matmul to simulate.
+ */
+ENV.registerFlag('WEBGPU_USE_NAIVE_CONV2D_TRANSPOSE', () => true);
+/**
+ * Whether we use low power GPU. Otherwise, a high performance GPU will be
+ * requested.
+ */
+ENV.registerFlag('WEBGPU_USE_LOW_POWER_GPU', () => false);
+/**
+ * Threshold for input tensor size that determines whether WebGPU backend will
+ * delegate computation to CPU.
+ *
+ * Default value is 1000.
+ */
+ENV.registerFlag('WEBGPU_CPU_HANDOFF_SIZE_THRESHOLD', () => 1000);
+/**
+ * Whether to use a dummy canvas to make profiling tools like PIX work with
+ * TFJS webgpu backend.
+ */
+ENV.registerFlag('WEBGPU_USE_PROFILE_TOOL', () => false);
+/**
+ * Whether to use import API.
+ */
+ENV.registerFlag('WEBGPU_IMPORT_EXTERNAL_TEXTURE', () => true);
+/**
+ * Whether to use conv2dNaive for debugging.
+ */
+ENV.registerFlag('WEBGPU_USE_NAIVE_CONV2D_DEBUG', () => false);
+/**
+ * Threshold to increase dispatched workgroups for matmul. If too few workgroups
+ * are dispatched, it means the hardware may be in low occupancy.
+ * -1 means it's not set by the user. A default strategy will be applied.
+ */
+ENV.registerFlag('WEBGPU_THRESHOLD_TO_INCREASE_WORKGROUPS_FOR_MATMUL', () => -1);
+/**
+ * Whether we will run im2col as a separate shader for convolution.
+ */
+ENV.registerFlag('WEBGPU_CONV_SEPARATE_IM2COL_SHADER', () => false);
+/**
+ * A string used to match shader key. If any matches, print the related shader.
+ * Seperated by comma. 'all' to print all. 'binary' to print binary(add, mul,
+ * etc.). 'unary,conv2d' to print both unary and conv2d.
+ */
+ENV.registerFlag('WEBGPU_PRINT_SHADER', () => '');
+/** Experimental flag, whether enter compile only phase. */
+ENV.registerFlag('WEBGPU_ENGINE_COMPILE_ONLY', () => false);
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiZmxhZ3Nfd2ViZ3B1LmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vLi4vLi4vLi4vdGZqcy1iYWNrZW5kLXdlYmdwdS9zcmMvZmxhZ3Nfd2ViZ3B1LnRzIl0sIm5hbWVzIjpbXSwibWFwcGluZ3MiOiJBQUFBOzs7Ozs7Ozs7Ozs7Ozs7R0FlRztBQUVILE9BQU8sRUFBQyxHQUFHLEVBQUMsTUFBTSx1QkFBdUIsQ0FBQztBQUUxQyxNQUFNLEdBQUcsR0FBRyxHQUFHLEVBQUUsQ0FBQztBQUVsQiw4REFBOEQ7QUFDOUQsR0FBRyxDQUFDLFlBQVksQ0FBQyxtQ0FBbUMsRUFBRSxHQUFHLEVBQUUsQ0FBQyxFQUFFLENBQUMsQ0FBQztBQUVoRTs7O0dBR0c7QUFDSCxHQUFHLENBQUMsWUFBWSxDQUFDLG9CQUFvQixFQUFFLEdBQUcsRUFBRSxDQUFDLElBQUksQ0FBQyxDQUFDO0FBRW5EOzs7O0dBSUc7QUFDSCxHQUFHLENBQUMsWUFBWSxDQUFDLDRCQUE0QixFQUFFLEdBQUcsRUFBRSxDQUFDLENBQUMsQ0FBQyxDQUFDLENBQUM7QUFFekQ7OztHQUdHO0FBQ0gsR0FBRyxDQUFDLFlBQVksQ0FBQyxtQ0FBbUMsRUFBRSxHQUFHLEVBQUUsQ0FBQyxJQUFJLENBQUMsQ0FBQztBQUVsRTs7O0dBR0c7QUFDSCxHQUFHLENBQUMsWUFBWSxDQUFDLDBCQUEwQixFQUFFLEdBQUcsRUFBRSxDQUFDLEtBQUssQ0FBQyxDQUFDO0FBRTFEOzs7OztHQUtHO0FBQ0gsR0FBRyxDQUFDLFlBQVksQ0FBQyxtQ0FBbUMsRUFBRSxHQUFHLEVBQUUsQ0FBQyxJQUFJLENBQUMsQ0FBQztBQUVsRTs7O0dBR0c7QUFDSCxHQUFHLENBQUMsWUFBWSxDQUFDLHlCQUF5QixFQUFFLEdBQUcsRUFBRSxDQUFDLEtBQUssQ0FBQyxDQUFDO0FBRXpEOztHQUVHO0FBQ0gsR0FBRyxDQUFDLFlBQVksQ0FBQyxnQ0FBZ0MsRUFBRSxHQUFHLEVBQUUsQ0FBQyxJQUFJLENBQUMsQ0FBQztBQUUvRDs7R0FFRztBQUNILEdBQUcsQ0FBQyxZQUFZLENBQUMsK0JBQStCLEVBQUUsR0FBRyxFQUFFLENBQUMsS0FBSyxDQUFDLENBQUM7QUFFL0Q7Ozs7R0FJRztBQUNILEdBQUcsQ0FBQyxZQUFZLENBQ1osb0RBQW9ELEVBQUUsR0FBRyxFQUFFLENBQUMsQ0FBQyxDQUFDLENBQUMsQ0FBQztBQUVwRTs7R0FFRztBQUNILEdBQUcsQ0FBQyxZQUFZLENBQUMsb0NBQW9DLEVBQUUsR0FBRyxFQUFFLENBQUMsS0FBSyxDQUFDLENBQUM7QUFFcEU7Ozs7R0FJRztBQUNILEdBQUcsQ0FBQyxZQUFZLENBQUMscUJBQXFCLEVBQUUsR0FBRyxFQUFFLENBQUMsRUFBRSxDQUFDLENBQUM7QUFFbEQsMkRBQTJEO0FBQzNELEdBQUcsQ0FBQyxZQUFZLENBQUMsNEJBQTRCLEVBQUUsR0FBRyxFQUFFLENBQUMsS0FBSyxDQUFDLENBQUMiLCJzb3VyY2VzQ29udGVudCI6WyIvKipcbiAqIEBsaWNlbnNlXG4gKiBDb3B5cmlnaHQgMjAxOSBHb29nbGUgTExDLiBBbGwgUmlnaHRzIFJlc2VydmVkLlxuICogTGljZW5zZWQgdW5kZXIgdGhlIEFwYWNoZSBMaWNlbnNlLCBWZXJzaW9uIDIuMCAodGhlIFwiTGljZW5zZVwiKTtcbiAqIHlvdSBtYXkgbm90IHVzZSB0aGlzIGZpbGUgZXhjZXB0IGluIGNvbXBsaWFuY2Ugd2l0aCB0aGUgTGljZW5zZS5cbiAqIFlvdSBtYXkgb2J0YWluIGEgY29weSBvZiB0aGUgTGljZW5zZSBhdFxuICpcbiAqIGh0dHA6Ly93d3cuYXBhY2hlLm9yZy9saWNlbnNlcy9MSUNFTlNFLTIuMFxuICpcbiAqIFVubGVzcyByZXF1aXJlZCBieSBhcHBsaWNhYmxlIGxhdyBvciBhZ3JlZWQgdG8gaW4gd3JpdGluZywgc29mdHdhcmVcbiAqIGRpc3RyaWJ1dGVkIHVuZGVyIHRoZSBMaWNlbnNlIGlzIGRpc3RyaWJ1dGVkIG9uIGFuIFwiQVMgSVNcIiBCQVNJUyxcbiAqIFdJVEhPVVQgV0FSUkFOVElFUyBPUiBDT05ESVRJT05TIE9GIEFOWSBLSU5ELCBlaXRoZXIgZXhwcmVzcyBvciBpbXBsaWVkLlxuICogU2VlIHRoZSBMaWNlbnNlIGZvciB0aGUgc3BlY2lmaWMgbGFuZ3VhZ2UgZ292ZXJuaW5nIHBlcm1pc3Npb25zIGFuZFxuICogbGltaXRhdGlvbnMgdW5kZXIgdGhlIExpY2Vuc2UuXG4gKiA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PVxuICovXG5cbmltcG9ydCB7ZW52fSBmcm9tICdAdGVuc29yZmxvdy90ZmpzLWNvcmUnO1xuXG5jb25zdCBFTlYgPSBlbnYoKTtcblxuLyoqIFRoZSBiYXRjaGVkIGRpc3BhdGNoaW5nIGNhbGxzIHNpemUgaW4gdGhlIGRldmljZSBxdWV1ZS4gKi9cbkVOVi5yZWdpc3RlckZsYWcoJ1dFQkdQVV9ERUZFUlJFRF9TVUJNSVRfQkFUQ0hfU0laRScsICgpID0+IDE1KTtcblxuLyoqXG4gKiBXaGV0aGVyIHdlIGZvcndhcmQgZXhlY3V0aW9uIHRvIHRoZSBDUFUgYmFja2VuZCBpZiB0ZW5zb3JzIGFyZSBzbWFsbCBhbmRcbiAqIHJlc2lkZSBvbiB0aGUgQ1BVLlxuICovXG5FTlYucmVnaXN0ZXJGbGFnKCdXRUJHUFVfQ1BVX0ZPUldBUkQnLCAoKSA9PiB0cnVlKTtcblxuLyoqXG4gKiBUaGlzIGZsYWcgaXMgdXNlZCB0byB0ZXN0IGRpZmZlcmVudCB0eXBlcyBvZiBtYXRtdWwgcHJvZ3JhbXMuXG4gKlxuICogU2VlIE1hdE11bFByb2dyYW1UeXBlIGluIHdlYmdwdV91dGlsLnRzIGZvciBhIGxpc3Qgb2YgYXZhaWxhYmxlIHZhbHVlcy5cbiAqL1xuRU5WLnJlZ2lzdGVyRmxhZygnV0VCR1BVX01BVE1VTF9QUk9HUkFNX1RZUEUnLCAoKSA9PiAtMSk7XG5cbi8qKlxuICogV2hldGhlciB0byB1c2UgY29udjJkVHJhbnNwb3NlX25haXZlIHdoaWNoIGRpcmVjdGx5IGltcGxlbWVudCB0aGVcbiAqIGNvbnYyZFRyYW5zcG9zZSBsb2dpYyByYXRoZXIgdGhhbiB1c2luZyBhIG1hdG11bCB0byBzaW11bGF0ZS5cbiAqL1xuRU5WLnJlZ2lzdGVyRmxhZygnV0VCR1BVX1VTRV9OQUlWRV9DT05WMkRfVFJBTlNQT1NFJywgKCkgPT4gdHJ1ZSk7XG5cbi8qKlxuICogV2hldGhlciB3ZSB1c2UgbG93IHBvd2VyIEdQVS4gT3RoZXJ3aXNlLCBhIGhpZ2ggcGVyZm9ybWFuY2UgR1BVIHdpbGwgYmVcbiAqIHJlcXVlc3RlZC5cbiAqL1xuRU5WLnJlZ2lzdGVyRmxhZygnV0VCR1BVX1VTRV9MT1dfUE9XRVJfR1BVJywgKCkgPT4gZmFsc2UpO1xuXG4vKipcbiAqIFRocmVzaG9sZCBmb3IgaW5wdXQgdGVuc29yIHNpemUgdGhhdCBkZXRlcm1pbmVzIHdoZXRoZXIgV2ViR1BVIGJhY2tlbmQgd2lsbFxuICogZGVsZWdhdGUgY29tcHV0YXRpb24gdG8gQ1BVLlxuICpcbiAqIERlZmF1bHQgdmFsdWUgaXMgMTAwMC5cbiAqL1xuRU5WLnJlZ2lzdGVyRmxhZygnV0VCR1BVX0NQVV9IQU5ET0ZGX1NJWkVfVEhSRVNIT0xEJywgKCkgPT4gMTAwMCk7XG5cbi8qKlxuICogV2hldGhlciB0byB1c2UgYSBkdW1teSBjYW52YXMgdG8gbWFrZSBwcm9maWxpbmcgdG9vbHMgbGlrZSBQSVggd29yayB3aXRoXG4gKiBURkpTIHdlYmdwdSBiYWNrZW5kLlxuICovXG5FTlYucmVnaXN0ZXJGbGFnKCdXRUJHUFVfVVNFX1BST0ZJTEVfVE9PTCcsICgpID0+IGZhbHNlKTtcblxuLyoqXG4gKiBXaGV0aGVyIHRvIHVzZSBpbXBvcnQgQVBJLlxuICovXG5FTlYucmVnaXN0ZXJGbGFnKCdXRUJHUFVfSU1QT1JUX0VYVEVSTkFMX1RFWFRVUkUnLCAoKSA9PiB0cnVlKTtcblxuLyoqXG4gKiBXaGV0aGVyIHRvIHVzZSBjb252MmROYWl2ZSBmb3IgZGVidWdnaW5nLlxuICovXG5FTlYucmVnaXN0ZXJGbGFnKCdXRUJHUFVfVVNFX05BSVZFX0NPTlYyRF9ERUJVRycsICgpID0+IGZhbHNlKTtcblxuLyoqXG4gKiBUaHJlc2hvbGQgdG8gaW5jcmVhc2UgZGlzcGF0Y2hlZCB3b3JrZ3JvdXBzIGZvciBtYXRtdWwuIElmIHRvbyBmZXcgd29ya2dyb3Vwc1xuICogYXJlIGRpc3BhdGNoZWQsIGl0IG1lYW5zIHRoZSBoYXJkd2FyZSBtYXkgYmUgaW4gbG93IG9jY3VwYW5jeS5cbiAqIC0xIG1lYW5zIGl0J3Mgbm90IHNldCBieSB0aGUgdXNlci4gQSBkZWZhdWx0IHN0cmF0ZWd5IHdpbGwgYmUgYXBwbGllZC5cbiAqL1xuRU5WLnJlZ2lzdGVyRmxhZyhcbiAgICAnV0VCR1BVX1RIUkVTSE9MRF9UT19JTkNSRUFTRV9XT1JLR1JPVVBTX0ZPUl9NQVRNVUwnLCAoKSA9PiAtMSk7XG5cbi8qKlxuICogV2hldGhlciB3ZSB3aWxsIHJ1biBpbTJjb2wgYXMgYSBzZXBhcmF0ZSBzaGFkZXIgZm9yIGNvbnZvbHV0aW9uLlxuICovXG5FTlYucmVnaXN0ZXJGbGFnKCdXRUJHUFVfQ09OVl9TRVBBUkFURV9JTTJDT0xfU0hBREVSJywgKCkgPT4gZmFsc2UpO1xuXG4vKipcbiAqIEEgc3RyaW5nIHVzZWQgdG8gbWF0Y2ggc2hhZGVyIGtleS4gSWYgYW55IG1hdGNoZXMsIHByaW50IHRoZSByZWxhdGVkIHNoYWRlci5cbiAqIFNlcGVyYXRlZCBieSBjb21tYS4gJ2FsbCcgdG8gcHJpbnQgYWxsLiAnYmluYXJ5JyB0byBwcmludCBiaW5hcnkoYWRkLCBtdWwsXG4gKiBldGMuKS4gJ3VuYXJ5LGNvbnYyZCcgdG8gcHJpbnQgYm90aCB1bmFyeSBhbmQgY29udjJkLlxuICovXG5FTlYucmVnaXN0ZXJGbGFnKCdXRUJHUFVfUFJJTlRfU0hBREVSJywgKCkgPT4gJycpO1xuXG4vKiogRXhwZXJpbWVudGFsIGZsYWcsIHdoZXRoZXIgZW50ZXIgY29tcGlsZSBvbmx5IHBoYXNlLiAqL1xuRU5WLnJlZ2lzdGVyRmxhZygnV0VCR1BVX0VOR0lORV9DT01QSUxFX09OTFknLCAoKSA9PiBmYWxzZSk7XG4iXX0=
