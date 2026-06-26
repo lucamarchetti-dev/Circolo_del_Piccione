@@ -128,3 +128,49 @@ body {
 .hidden-video {
   display: none;
 }
+<<<<<<< HEAD
+=======
+
+/* ─── BOTTONE TORNA AL MENU — tema western ─── */
+.btn-back-outlaw {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding: 12px 28px;
+  font-family: 'Press Start 2P', sans-serif;
+  font-size: 13px;
+  color: #1a0a00;
+  background: linear-gradient(135deg, #f8aa03 0%, #e07b00 60%, #b85000 100%);
+  border: 3px solid #7a3800;
+  border-radius: 8px;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow:
+    0 0 0 2px rgba(248, 170, 3, 0.25),
+    0 5px 18px rgba(120, 60, 0, 0.6),
+    inset 0 1px 0 rgba(255,255,255,0.22);
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.25);
+}
+
+.btn-back-outlaw:hover {
+  background: linear-gradient(135deg, #ffc433 0%, #f09000 60%, #cc6000 100%);
+  box-shadow:
+    0 0 0 2px rgba(248, 195, 51, 0.4),
+    0 7px 24px rgba(120, 60, 0, 0.75),
+    inset 0 1px 0 rgba(255,255,255,0.28);
+  transform: translateY(-3px);
+}
+
+.btn-back-outlaw:active {
+  transform: translateY(0px);
+  box-shadow:
+    0 0 0 2px rgba(248, 170, 3, 0.2),
+    0 2px 8px rgba(120, 60, 0, 0.4);
+}
+>>>>>>> 9ceff38 (Demo progetto conclusa)

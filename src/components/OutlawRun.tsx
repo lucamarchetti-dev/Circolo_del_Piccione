@@ -108,7 +108,11 @@ export default function OutlawRun({ onBack }: OutlawRunProps) { //onBack aggiunt
       {/* FOOTER */}
       <footer className="app-footer">
         <h3>Usa i movimenti del corpo per giocare | Alimentato da TensorFlow.js</h3>
+<<<<<<< HEAD
         <button onClick={onBack}>⬅ Torna al Menu</button>
+=======
+        <button className="btn-back-outlaw" onClick={onBack}>⬅ Torna al Menu</button>
+>>>>>>> 9ceff38 (Demo progetto conclusa)
       </footer>
     </div>
   );

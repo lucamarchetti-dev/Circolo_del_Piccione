@@ -14,9 +14,15 @@ const gameOverImage = new Image();
 gameOverImage.src = gameOverBg;
 
 // dichiarazione dimensione canva
+<<<<<<< HEAD
 const VIDEO_WIDTH = 640;
 const VIDEO_HEIGHT = 480;
 const PIGEON_SIZE = 60;
+=======
+const VIDEO_WIDTH = 1200;
+const VIDEO_HEIGHT = 800;
+const PIGEON_SIZE = 200;
+>>>>>>> 9ceff38 (Demo progetto conclusa)
 
 interface PigeonBlasterProps {
   onBack: () => void;
@@ -88,7 +94,10 @@ function PigeonBlaster({ onBack }: PigeonBlasterProps) {
   const gameTimerRef = useRef(0);
   const isVictoryRef = useRef(false);
 
+<<<<<<< HEAD
   // FIX: Spostato difficultyRef al livello base del componente
+=======
+>>>>>>> 9ceff38 (Demo progetto conclusa)
   const difficultyRef = useRef(DIFFICULTIES.easy);
 
   // Stati di React per l'interfaccia
@@ -98,8 +107,13 @@ function PigeonBlaster({ onBack }: PigeonBlasterProps) {
   const [isGameOver, setIsGameOver] = useState(false);
   const [isVictory, setIsVictory] = useState(false);
   const [difficulty, setDifficulty] = useState<keyof typeof DIFFICULTIES>("easy");
+<<<<<<< HEAD
 
   // FIX: Questo useEffect va qui, non dentro la funzione loop()! 
+=======
+  const [timeRemaining, setTimeRemaining] = useState(DIFFICULTIES.easy.gameDuration);
+
+>>>>>>> 9ceff38 (Demo progetto conclusa)
   // Aggiorna la referenza quando cambia lo stato della difficoltà
   useEffect(() => {
     difficultyRef.current = DIFFICULTIES[difficulty];
@@ -136,8 +150,11 @@ function PigeonBlaster({ onBack }: PigeonBlasterProps) {
       poseDetection.SupportedModels.MoveNet,
       {
         modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING,
+<<<<<<< HEAD
         // modelType: poseDetection.movenet.modelType.SINGLEPOSE_LIGHTNING,
         // meglio per uso piu' leggero di GPU
+=======
+>>>>>>> 9ceff38 (Demo progetto conclusa)
         // modelType: poseDetection.movenet.modelType.SINGLEPOSE_THUNDER
         // per identificare meglio polsi, more accurate ma piu' pesante
         // modelType: poseDetection.movenet.modelType.MULTIPOSE_LIGHTNING
@@ -199,7 +216,10 @@ function PigeonBlaster({ onBack }: PigeonBlasterProps) {
   }
   //#endregion
 
+<<<<<<< HEAD
   // FIX: Ristrutturate le funzioni di riavvio in modo che non siano nidificate
+=======
+>>>>>>> 9ceff38 (Demo progetto conclusa)
   function restartGame() {
     const config = difficultyRef.current;
     
@@ -217,11 +237,18 @@ function PigeonBlaster({ onBack }: PigeonBlasterProps) {
     setLives(config.maxLives);
     setIsGameOver(false);
     setIsVictory(false);
+<<<<<<< HEAD
+=======
+    setTimeRemaining(config.gameDuration);
+>>>>>>> 9ceff38 (Demo progetto conclusa)
   }
 
   function restartAndResume() {
     restartGame();
+<<<<<<< HEAD
     // Fa ripartire il loop solo se era fermo
+=======
+>>>>>>> 9ceff38 (Demo progetto conclusa)
     if (!animationRef.current) {
       loop();
     }
@@ -231,7 +258,10 @@ function PigeonBlaster({ onBack }: PigeonBlasterProps) {
     const video = videoRef.current;
     const canvas = canvasRef.current;
     const detector = detectorRef.current;
+<<<<<<< HEAD
     
+=======
+>>>>>>> 9ceff38 (Demo progetto conclusa)
 
     if (!video || !canvas || !detector) return;
 
@@ -255,6 +285,10 @@ function PigeonBlaster({ onBack }: PigeonBlasterProps) {
     }
 
     ctx.drawImage(video, 0, 0, VIDEO_WIDTH, VIDEO_HEIGHT);
+<<<<<<< HEAD
+=======
+
+>>>>>>> 9ceff38 (Demo progetto conclusa)
     // Helper funzioni rendering
     const drawTextUnflipped = (text: string, x: number, y: number, font: string, color: string, align: CanvasTextAlign = 'left') => {
       ctx.save();
@@ -276,7 +310,11 @@ function PigeonBlaster({ onBack }: PigeonBlasterProps) {
       drawTextUnflipped(`Piccioni presi: ${scoreRef.current}`, VIDEO_WIDTH / 2, VIDEO_HEIGHT / 2 + 20, "bold 20px PPNeueBit", "white", "center");
     }
 
+<<<<<<< HEAD
     const boxW = 300;
+=======
+    const boxW = 500;
+>>>>>>> 9ceff38 (Demo progetto conclusa)
     const boxH = boxW;  
     const boxX = (VIDEO_WIDTH - boxW) / 2;
     const boxY = (VIDEO_HEIGHT - boxH) / 2;
@@ -298,9 +336,15 @@ function PigeonBlaster({ onBack }: PigeonBlasterProps) {
       if (leftWrist) wristLeftRef.current = { x: leftWrist.x, y: leftWrist.y };
       if (rightWrist) wristRightRef.current = { x: rightWrist.x, y: rightWrist.y };
 
+<<<<<<< HEAD
       // drawKeypoints è disabilitato: commentare la riga seguente per nascondere
       // i pallini sulle articolazioni/faccia della persona rilevata dalla posa.
       // drawKeypoints(ctx, activePose, 0.3);
+=======
+      // drawKeypoints abilitato: mostra i pallini di debug sulle articolazioni rilevate.
+      // Commentare la riga seguente per nasconderli in produzione.
+      drawKeypoints(ctx, activePose, 0.3);
+>>>>>>> 9ceff38 (Demo progetto conclusa)
       drawArm(ctx, activePose, 'left', 0.3);
       drawArm(ctx, activePose, 'right', 0.3);
     }
@@ -355,27 +399,45 @@ function PigeonBlaster({ onBack }: PigeonBlasterProps) {
       gameTimerRef.current += dt;
       const gameDuration = difficultyRef.current.gameDuration;
 
+<<<<<<< HEAD
       // Controllo Vittoria per scadenza tempo
       if (gameTimerRef.current >= gameDuration) {
         isVictoryRef.current = true;
         setIsVictory(true);
         // Non facciamo `return` qui così l'interfaccia si aggiorna al prossimo frame
+=======
+      // Aggiorna il timer React per la UI sopra la canvas
+      setTimeRemaining(Math.max(0, gameDuration - gameTimerRef.current));
+
+      if (gameTimerRef.current >= gameDuration) {
+        isVictoryRef.current = true;
+        setIsVictory(true);
+>>>>>>> 9ceff38 (Demo progetto conclusa)
       } else {
         spawnTimerRef.current += dt;
         const maxPigeons = difficultyRef.current.maxPigeons;
 
+<<<<<<< HEAD
         // Spawn nuovi piccioni
+=======
+>>>>>>> 9ceff38 (Demo progetto conclusa)
         if (pigeonsRef.current.length < maxPigeons && spawnTimerRef.current > 0.6) {
           spawnPigeon();
           spawnTimerRef.current = 0;
         }
 
+<<<<<<< HEAD
         // Invecchiamento piccioni
+=======
+>>>>>>> 9ceff38 (Demo progetto conclusa)
         for (const pigeon of pigeonsRef.current) {
           pigeon.age += dt;
         }
 
+<<<<<<< HEAD
         // Rimozione piccioni scaduti
+=======
+>>>>>>> 9ceff38 (Demo progetto conclusa)
         const lifetime = difficultyRef.current.pigeonLifetime;
         const beforeCount = pigeonsRef.current.length;
 
@@ -383,7 +445,10 @@ function PigeonBlaster({ onBack }: PigeonBlasterProps) {
 
         const removed = beforeCount - pigeonsRef.current.length;
 
+<<<<<<< HEAD
         // Perdita di vite
+=======
+>>>>>>> 9ceff38 (Demo progetto conclusa)
         if (removed > 0) {
           livesRef.current -= removed;
           setLives(livesRef.current);
@@ -391,7 +456,10 @@ function PigeonBlaster({ onBack }: PigeonBlasterProps) {
           ctx.fillRect(0, 0, VIDEO_WIDTH, VIDEO_HEIGHT);
         }
 
+<<<<<<< HEAD
         // Controllo Sconfitta
+=======
+>>>>>>> 9ceff38 (Demo progetto conclusa)
         if (livesRef.current <= 0) {
           isGameOverRef.current = true;
           setIsGameOver(true);
@@ -448,7 +516,11 @@ function PigeonBlaster({ onBack }: PigeonBlasterProps) {
       }
     }
 
+<<<<<<< HEAD
     // Controllo Collisioni (Hit) - Ottimizzato
+=======
+    // Controllo Collisioni (Hit)
+>>>>>>> 9ceff38 (Demo progetto conclusa)
     if (!isGameOverRef.current && !isVictoryRef.current) {
       pigeonsRef.current = pigeonsRef.current.filter((pigeon) => {
         const hitLeft = lwx >= pigeon.x && lwx <= pigeon.x + PIGEON_SIZE && lwy >= pigeon.y && lwy <= pigeon.y + PIGEON_SIZE;
@@ -457,7 +529,11 @@ function PigeonBlaster({ onBack }: PigeonBlasterProps) {
         if (hitLeft || hitRight) {
           scoreRef.current++;
           setScore(scoreRef.current);
+<<<<<<< HEAD
           return false; // Rimuove il piccione colpito
+=======
+          return false;
+>>>>>>> 9ceff38 (Demo progetto conclusa)
         }
         return true;
       });
@@ -473,6 +549,7 @@ function PigeonBlaster({ onBack }: PigeonBlasterProps) {
       const currentX = startX + i * (heartWidth + gap);
     
       if (isAlive && heartFullImgRef.current && heartFullImgRef.current.complete) {
+<<<<<<< HEAD
         drawImageUnflipped(heartFullImgRef.current, currentX, 30, heartWidth, heartWidth);
       } else if (!isAlive && heartDeadImgRef.current && heartDeadImgRef.current.complete) {
         drawImageUnflipped(heartDeadImgRef.current, currentX, 30, heartWidth, heartWidth);
@@ -483,6 +560,14 @@ function PigeonBlaster({ onBack }: PigeonBlasterProps) {
     drawTextUnflipped(`Punteggio: ${scoreRef.current}`, 30, 115, "bold 20px PPNeueBit", "white");
     drawTextUnflipped(`Record: ${highScoreRef.current}`, 30, 150, "bold 20px PPNeueBit", "#FFD700");
 
+=======
+        drawImageUnflipped(heartFullImgRef.current, currentX, 20, heartWidth, heartWidth);
+      } else if (!isAlive && heartDeadImgRef.current && heartDeadImgRef.current.complete) {
+        drawImageUnflipped(heartDeadImgRef.current, currentX, 20, heartWidth, heartWidth);
+      }
+    }
+
+>>>>>>> 9ceff38 (Demo progetto conclusa)
     // Rendering Schermata Game Over
     if (isGameOverRef.current) {
       ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
@@ -493,6 +578,7 @@ function PigeonBlaster({ onBack }: PigeonBlasterProps) {
       drawTextUnflipped(`Record Massimo: ${highScoreRef.current}`, VIDEO_WIDTH / 2, VIDEO_HEIGHT / 2 + 55, "bold 22px PPNeueBit", "#FFD700", "center");
     }
 
+<<<<<<< HEAD
     // Disegno della barra del tempo (condiviso tra game over, in gioco e vittoria)
     const remainingTime = Math.max(0, difficultyRef.current.gameDuration - gameTimerRef.current);
     drawTextUnflipped(`Tempo: ${Math.ceil(remainingTime)}s`, VIDEO_WIDTH / 2, 40, "bold 20px PPNeueBit", "#00FFFF", "center");
@@ -509,6 +595,26 @@ function PigeonBlaster({ onBack }: PigeonBlasterProps) {
       animationRef.current = requestAnimationFrame(loop);
     } else {
       // In caso di game over / vittoria, azzeriamo il ref così sappiamo che è fermo
+=======
+    // Barra del tempo sulla canvas (piccola, in fondo)
+    const remainingTime = Math.max(0, difficultyRef.current.gameDuration - gameTimerRef.current);
+    const percentage = remainingTime / difficultyRef.current.gameDuration;
+    const barY = VIDEO_HEIGHT - 12;
+    const barW = VIDEO_WIDTH - 20;
+    
+    ctx.fillStyle = "rgba(0,0,0,0.4)";
+    ctx.fillRect(10, barY, barW, 8);
+    
+    const grad = ctx.createLinearGradient(10, 0, 10 + barW * percentage, 0);
+    grad.addColorStop(0, percentage > 0.3 ? "#00FF66" : "#FF4444");
+    grad.addColorStop(1, percentage > 0.3 ? "#00CCAA" : "#FF8800");
+    ctx.fillStyle = grad;
+    ctx.fillRect(10, barY, barW * percentage, 8);
+
+    if (!isGameOverRef.current && !isVictoryRef.current) {
+      animationRef.current = requestAnimationFrame(loop);
+    } else {
+>>>>>>> 9ceff38 (Demo progetto conclusa)
       animationRef.current = null;
     }
   }
@@ -550,6 +656,12 @@ function PigeonBlaster({ onBack }: PigeonBlasterProps) {
     }
   }, [selectedDeviceId]);
 
+<<<<<<< HEAD
+=======
+  // Percentuale tempo per la barra UI sopra canvas
+  const timePct = timeRemaining / difficultyRef.current.gameDuration;
+
+>>>>>>> 9ceff38 (Demo progetto conclusa)
   return (
     <div className="game-container">
       <div className="header-container">
@@ -560,6 +672,7 @@ function PigeonBlaster({ onBack }: PigeonBlasterProps) {
         </div>
         <img src={piccioneTerra} alt="Piccione decorativo destro" className="pigeon-decor pigeon-right" />
       </div>
+<<<<<<< HEAD
       
       <div className="stats-bar">
         <span>Punteggio Corrente: <strong>{score}</strong></span>
@@ -570,6 +683,50 @@ function PigeonBlaster({ onBack }: PigeonBlasterProps) {
       <div className="controls-bar">
         <div>
           <label htmlFor="camera-select" className="camera-label">Fotocamera: </label>
+=======
+
+      {/* HUD sopra la canvas */}
+      <div className="hud-bar">
+        <div className="hud-section hud-score">
+          <span className="hud-label">Score</span>
+          <span className="hud-value">{score}</span>
+        </div>
+
+        <div className="hud-section hud-lives">
+          <span className="hud-label">Vite</span>
+          <span className="hud-value">{lives}/{DIFFICULTIES[difficulty].maxLives}</span>
+        </div>
+
+        <div className="hud-section hud-timer">
+          <span className="hud-label">Tempo</span>
+          <span className="hud-value hud-timer-value" style={{ color: timePct < 0.3 ? '#FF4444' : '#00FFCC' }}>
+            {Math.ceil(timeRemaining)}s
+          </span>
+          {/* Barra timer decorativa nell'HUD */}
+          <div className="timer-bar-track">
+            <div
+              className="timer-bar-fill"
+              style={{
+                width: `${timePct * 100}%`,
+                background: timePct > 0.3
+                  ? 'linear-gradient(90deg, #00FF66, #00CCAA)'
+                  : 'linear-gradient(90deg, #FF4444, #FF8800)',
+              }}
+            />
+          </div>
+        </div>
+
+        <div className="hud-section hud-highscore">
+          <span className="hud-label">Record</span>
+          <span className="hud-value hud-highscore-value">{highScore}</span>
+        </div>
+      </div>
+
+      {/* Barra controlli */}
+      <div className="controls-bar">
+        <div className="control-group">
+          <label htmlFor="camera-select" className="camera-label">Fotocamera:</label>
+>>>>>>> 9ceff38 (Demo progetto conclusa)
           <select
             id="camera-select"
             value={selectedDeviceId}
@@ -584,14 +741,32 @@ function PigeonBlaster({ onBack }: PigeonBlasterProps) {
           </select>
         </div>
 
+<<<<<<< HEAD
         {(isGameOver || isVictory) && (
           // Ora questo bottone troverà la funzione al giusto livello!
+=======
+        <div className="control-group">
+          <label className="camera-label">Difficoltà:</label>
+          <select
+            value={difficulty}
+            onChange={(e) => setDifficulty(e.target.value as keyof typeof DIFFICULTIES)}
+            className="camera-select"
+          >
+            <option value="easy">Facile</option>
+            <option value="medium">Media</option>
+            <option value="hard">Difficile</option>
+          </select>
+        </div>
+
+        {(isGameOver || isVictory) && (
+>>>>>>> 9ceff38 (Demo progetto conclusa)
           <button onClick={restartAndResume} className="btn-retry">
             Riprova
           </button>
         )}
       </div>
 
+<<<<<<< HEAD
       <div className='selettore-difficoulty'>
         <label style={{ marginRight: "10px", fontWeight: "bold" }}>Difficoltà:</label>
         <select
@@ -605,6 +780,8 @@ function PigeonBlaster({ onBack }: PigeonBlasterProps) {
         </select>
       </div>
 
+=======
+>>>>>>> 9ceff38 (Demo progetto conclusa)
       <canvas
         ref={canvasRef}
         width={VIDEO_WIDTH}
@@ -614,11 +791,19 @@ function PigeonBlaster({ onBack }: PigeonBlasterProps) {
 
       <video ref={videoRef} width={VIDEO_WIDTH} height={VIDEO_HEIGHT} style={{ display: "none" }}/>
 
+<<<<<<< HEAD
       <div>
         <button onClick={onBack}>⬅ Torna al Menu</button>
         <h1>Pigeon Blaster Attivo!</h1>
       </div>
 
+=======
+      <div className="bottom-bar">
+        <button className="btn-back-pigeon" onClick={onBack}>
+          Torna al Menu
+        </button>
+      </div>
+>>>>>>> 9ceff38 (Demo progetto conclusa)
     </div>
   );
 }
