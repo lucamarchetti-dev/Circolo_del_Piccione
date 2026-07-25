@@ -449,7 +449,7 @@ function PigeonBlaster({ onBack }: PigeonBlasterProps) {
     // contro-specchiamento, altrimenti apparirebbe rovesciata sullo schermo.
     const drawImageUnflipped = (img: HTMLImageElement, x: number, y: number, width: number, height: number) => {
       ctx.save();
-      const canvasX = VIDEO_WIDTH - x - width;
+      const canvasX = VIDEO_WIDTH - x;
       ctx.translate(canvasX, y);
       ctx.scale(-1, 1);
       ctx.drawImage(img, 0, 0, width, height);
