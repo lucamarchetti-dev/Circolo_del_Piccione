@@ -1,0 +1,39 @@
+/**
+ * @license
+ * Copyright 2021 Google LLC. All Rights Reserved.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * =============================================================================
+ */
+import { Neg } from '@tensorflow/tfjs-core';
+import { negImplCPU } from '../kernel_utils/shared';
+import { UnaryOpType } from '../unary_op_util';
+import { UnaryOpProgram } from '../unary_op_webgpu';
+// This doesn't use unaryKernelFunc because negImplCPU is not of type
+// SimpleUnaryKernelImplCPU.
+export function neg(args) {
+    const { inputs, backend } = args;
+    const { x } = inputs;
+    if (backend.shouldExecuteOnCPU([x])) {
+        const xData = backend.tensorMap.get(x.dataId);
+        const [outValues, newShape] = negImplCPU(xData.values, x.shape, x.dtype);
+        return backend.makeTensorInfo(newShape, x.dtype, outValues);
+    }
+    const program = new UnaryOpProgram(x.shape, UnaryOpType.NEG);
+    return backend.runWebGPUProgram(program, [x], x.dtype);
+}
+export const negConfig = {
+    kernelName: Neg,
+    backendName: 'webgpu',
+    kernelFunc: neg
+};
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiTmVnLmpzIiwic291cmNlUm9vdCI6IiIsInNvdXJjZXMiOlsiLi4vLi4vLi4vLi4vLi4vLi4vdGZqcy1iYWNrZW5kLXdlYmdwdS9zcmMva2VybmVscy9OZWcudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUE7Ozs7Ozs7Ozs7Ozs7OztHQWVHO0FBRUgsT0FBTyxFQUEyQixHQUFHLEVBQW9DLE1BQU0sdUJBQXVCLENBQUM7QUFHdkcsT0FBTyxFQUFDLFVBQVUsRUFBQyxNQUFNLHdCQUF3QixDQUFDO0FBRWxELE9BQU8sRUFBQyxXQUFXLEVBQUMsTUFBTSxrQkFBa0IsQ0FBQztBQUM3QyxPQUFPLEVBQUMsY0FBYyxFQUFDLE1BQU0sb0JBQW9CLENBQUM7QUFFbEQscUVBQXFFO0FBQ3JFLDRCQUE0QjtBQUM1QixNQUFNLFVBQVUsR0FBRyxDQUFDLElBQWlEO0lBRW5FLE1BQU0sRUFBQyxNQUFNLEVBQUUsT0FBTyxFQUFDLEdBQUcsSUFBSSxDQUFDO0lBQy9CLE1BQU0sRUFBQyxDQUFDLEVBQUMsR0FBRyxNQUFNLENBQUM7SUFFbkIsSUFBSSxPQUFPLENBQUMsa0JBQWtCLENBQUMsQ0FBQyxDQUFDLENBQUMsQ0FBQyxFQUFFO1FBQ25DLE1BQU0sS0FBSyxHQUFHLE9BQU8sQ0FBQyxTQUFTLENBQUMsR0FBRyxDQUFDLENBQUMsQ0FBQyxNQUFNLENBQUMsQ0FBQztRQUM5QyxNQUFNLENBQUMsU0FBUyxFQUFFLFFBQVEsQ0FBQyxHQUN2QixVQUFVLENBQUMsS0FBSyxDQUFDLE1BQW9CLEVBQUUsQ0FBQyxDQUFDLEtBQUssRUFBRSxDQUFDLENBQUMsS0FBSyxDQUFDLENBQUM7UUFDN0QsT0FBTyxPQUFPLENBQUMsY0FBYyxDQUFDLFFBQVEsRUFBRSxDQUFDLENBQUMsS0FBSyxFQUFFLFNBQVMsQ0FBQyxDQUFDO0tBQzdEO0lBRUQsTUFBTSxPQUFPLEdBQUcsSUFBSSxjQUFjLENBQUMsQ0FBQyxDQUFDLEtBQUssRUFBRSxXQUFXLENBQUMsR0FBRyxDQUFDLENBQUM7SUFFN0QsT0FBTyxPQUFPLENBQUMsZ0JBQWdCLENBQUMsT0FBTyxFQUFFLENBQUMsQ0FBQyxDQUFDLEVBQUUsQ0FBQyxDQUFDLEtBQUssQ0FBQyxDQUFDO0FBQ3pELENBQUM7QUFFRCxNQUFNLENBQUMsTUFBTSxTQUFTLEdBQWlCO0lBQ3JDLFVBQVUsRUFBRSxHQUFHO0lBQ2YsV0FBVyxFQUFFLFFBQVE7SUFDckIsVUFBVSxFQUFFLEdBQTRCO0NBQ3pDLENBQUMiLCJzb3VyY2VzQ29udGVudCI6WyIvKipcbiAqIEBsaWNlbnNlXG4gKiBDb3B5cmlnaHQgMjAyMSBHb29nbGUgTExDLiBBbGwgUmlnaHRzIFJlc2VydmVkLlxuICogTGljZW5zZWQgdW5kZXIgdGhlIEFwYWNoZSBMaWNlbnNlLCBWZXJzaW9uIDIuMCAodGhlIFwiTGljZW5zZVwiKTtcbiAqIHlvdSBtYXkgbm90IHVzZSB0aGlzIGZpbGUgZXhjZXB0IGluIGNvbXBsaWFuY2Ugd2l0aCB0aGUgTGljZW5zZS5cbiAqIFlvdSBtYXkgb2J0YWluIGEgY29weSBvZiB0aGUgTGljZW5zZSBhdFxuICpcbiAqIGh0dHA6Ly93d3cuYXBhY2hlLm9yZy9saWNlbnNlcy9MSUNFTlNFLTIuMFxuICpcbiAqIFVubGVzcyByZXF1aXJlZCBieSBhcHBsaWNhYmxlIGxhdyBvciBhZ3JlZWQgdG8gaW4gd3JpdGluZywgc29mdHdhcmVcbiAqIGRpc3RyaWJ1dGVkIHVuZGVyIHRoZSBMaWNlbnNlIGlzIGRpc3RyaWJ1dGVkIG9uIGFuIFwiQVMgSVNcIiBCQVNJUyxcbiAqIFdJVEhPVVQgV0FSUkFOVElFUyBPUiBDT05ESVRJT05TIE9GIEFOWSBLSU5ELCBlaXRoZXIgZXhwcmVzcyBvciBpbXBsaWVkLlxuICogU2VlIHRoZSBMaWNlbnNlIGZvciB0aGUgc3BlY2lmaWMgbGFuZ3VhZ2UgZ292ZXJuaW5nIHBlcm1pc3Npb25zIGFuZFxuICogbGltaXRhdGlvbnMgdW5kZXIgdGhlIExpY2Vuc2UuXG4gKiA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PVxuICovXG5cbmltcG9ydCB7S2VybmVsQ29uZmlnLCBLZXJuZWxGdW5jLCBOZWcsIE5lZ0lucHV0cywgVGVuc29ySW5mbywgVHlwZWRBcnJheX0gZnJvbSAnQHRlbnNvcmZsb3cvdGZqcy1jb3JlJztcblxuaW1wb3J0IHtXZWJHUFVCYWNrZW5kfSBmcm9tICcuLi9iYWNrZW5kX3dlYmdwdSc7XG5pbXBvcnQge25lZ0ltcGxDUFV9IGZyb20gJy4uL2tlcm5lbF91dGlscy9zaGFyZWQnO1xuXG5pbXBvcnQge1VuYXJ5T3BUeXBlfSBmcm9tICcuLi91bmFyeV9vcF91dGlsJztcbmltcG9ydCB7VW5hcnlPcFByb2dyYW19IGZyb20gJy4uL3VuYXJ5X29wX3dlYmdwdSc7XG5cbi8vIFRoaXMgZG9lc24ndCB1c2UgdW5hcnlLZXJuZWxGdW5jIGJlY2F1c2UgbmVnSW1wbENQVSBpcyBub3Qgb2YgdHlwZVxuLy8gU2ltcGxlVW5hcnlLZXJuZWxJbXBsQ1BVLlxuZXhwb3J0IGZ1bmN0aW9uIG5lZyhhcmdzOiB7aW5wdXRzOiBOZWdJbnB1dHMsIGJhY2tlbmQ6IFdlYkdQVUJhY2tlbmR9KTpcbiAgICBUZW5zb3JJbmZvIHtcbiAgY29uc3Qge2lucHV0cywgYmFja2VuZH0gPSBhcmdzO1xuICBjb25zdCB7eH0gPSBpbnB1dHM7XG5cbiAgaWYgKGJhY2tlbmQuc2hvdWxkRXhlY3V0ZU9uQ1BVKFt4XSkpIHtcbiAgICBjb25zdCB4RGF0YSA9IGJhY2tlbmQudGVuc29yTWFwLmdldCh4LmRhdGFJZCk7XG4gICAgY29uc3QgW291dFZhbHVlcywgbmV3U2hhcGVdID1cbiAgICAgICAgbmVnSW1wbENQVSh4RGF0YS52YWx1ZXMgYXMgVHlwZWRBcnJheSwgeC5zaGFwZSwgeC5kdHlwZSk7XG4gICAgcmV0dXJuIGJhY2tlbmQubWFrZVRlbnNvckluZm8obmV3U2hhcGUsIHguZHR5cGUsIG91dFZhbHVlcyk7XG4gIH1cblxuICBjb25zdCBwcm9ncmFtID0gbmV3IFVuYXJ5T3BQcm9ncmFtKHguc2hhcGUsIFVuYXJ5T3BUeXBlLk5FRyk7XG5cbiAgcmV0dXJuIGJhY2tlbmQucnVuV2ViR1BVUHJvZ3JhbShwcm9ncmFtLCBbeF0sIHguZHR5cGUpO1xufVxuXG5leHBvcnQgY29uc3QgbmVnQ29uZmlnOiBLZXJuZWxDb25maWcgPSB7XG4gIGtlcm5lbE5hbWU6IE5lZyxcbiAgYmFja2VuZE5hbWU6ICd3ZWJncHUnLFxuICBrZXJuZWxGdW5jOiBuZWcgYXMgdW5rbm93biBhcyBLZXJuZWxGdW5jXG59O1xuIl19

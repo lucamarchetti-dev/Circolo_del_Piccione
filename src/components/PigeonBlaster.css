@@ -1,0 +1,394 @@
+/* Importazione del Font Personalizzato */
+@font-face {
+  font-family: 'PPNeueBit';
+  src: url('../assets/fonts/PPNeueBit-Bold.otf') format('opentype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+/* Container Principale con Sfondo */
+.game-container {
+  text-align: center;
+  font-family: 'PPNeueBit', sans-serif;
+  min-height: 100vh;
+  background-image: 
+    url('../assets/png/sfondo-piume.png'),
+    url('../assets/png/sfondo-cielo.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  box-sizing: border-box;
+}
+
+/* Header dell'applicazione */
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  margin-bottom: 10px;
+  position: relative;
+}
+
+.title-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 0.82;
+  position: relative;
+  z-index: 2;
+}
+
+.main-title {
+  font-family: 'PPNeueBit', sans-serif;
+  font-size: 200px;
+  font-weight: bold;
+  margin: 0;
+  color: #000000;
+}
+
+.subtitle {
+  font-family: 'PPNeueBit', sans-serif;
+  font-size: 40px;
+  font-weight: bold;
+  margin: -10px 0 0;
+  color: #000000;
+}
+
+/* Piccioni animati nell'header */
+.pigeon-decor {
+  width: 140px;
+  height: auto;
+  object-fit: contain;
+  position: relative;
+  animation: pigeonBob 0.7s ease-in-out infinite;
+  transform-origin: 50% 75%;
+}
+
+.pigeon-left {
+  z-index: 3;
+  margin-right: -340px;
+}
+
+.pigeon-right {
+  z-index: 1;
+  margin-left: -360px;
+  transform: scaleX(-1);
+  animation: pigeonBobRight 0.7s ease-in-out infinite;
+}
+
+@keyframes pigeonBob {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  25%       { transform: translate(2px, 2px) rotate(5deg); }
+  50%       { transform: translate(4px, 4px) rotate(8deg); }
+  75%       { transform: translate(2px, 2px) rotate(4deg); }
+}
+
+@keyframes pigeonBobRight {
+  0%, 100% { transform: scaleX(-1) translateY(0) rotate(0deg); }
+  25%       { transform: scaleX(-1) translate(2px, 2px) rotate(-5deg); }
+  50%       { transform: scaleX(-1) translate(4px, 4px) rotate(-8deg); }
+  75%       { transform: scaleX(-1) translate(2px, 2px) rotate(-4deg); }
+}
+
+/* ─── HUD BAR ─── */
+.hud-bar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 28px;
+  margin: 0 auto 14px;
+  padding: 10px 28px;
+  width: fit-content;
+  background: rgba(0, 0, 0, 0.72);
+  border: 2px solid #6d009f;
+  border-radius: 12px;
+  box-shadow: 0 0 18px rgba(109, 0, 159, 0.45);
+  font-family: 'PPNeueBit', sans-serif;
+}
+
+.hud-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 70px;
+}
+
+.hud-label {
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #aaa;
+}
+
+.hud-value {
+  font-size: 26px;
+  font-weight: bold;
+  color: #ffffff;
+}
+
+.hud-highscore-value {
+  color: #FFD700;
+}
+
+/* Timer section con barra */
+.hud-timer {
+  min-width: 160px;
+}
+
+.hud-timer-value {
+  transition: color 0.3s;
+}
+
+.timer-bar-track {
+  width: 100%;
+  height: 6px;
+  background: rgba(255,255,255,0.15);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 4px;
+}
+
+.timer-bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.25s linear, background 0.5s;
+}
+
+/* Separatore tra sezioni HUD */
+.hud-section + .hud-section {
+  border-left: 1px solid rgba(255,255,255,0.12);
+  padding-left: 28px;
+}
+
+/* ─── CONTROLLI ─── */
+.controls-bar {
+  margin-bottom: 14px;
+  display: flex;
+  justify-content: center;
+  gap: 14px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.control-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.camera-label {
+  font-family: 'Helvetica', sans-serif;
+  font-size: 15px;
+  font-weight: bold;
+  color: #6d009f;
+}
+
+.camera-select {
+  padding: 6px 12px;
+  font-family: 'Helvetica', sans-serif;
+  font-size: 15px;
+  border-radius: 8px;
+  border: 2px solid #6d009f;
+  background: rgba(255,255,255,0.92);
+  cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.camera-select:hover,
+.camera-select:focus {
+  border-color: #a020f0;
+  box-shadow: 0 0 8px rgba(160,32,240,0.35);
+  outline: none;
+}
+
+.camera-select:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  border-color: #888;
+  box-shadow: none;
+}
+
+/* Bottone Riprova */
+.btn-retry {
+  padding: 8px 20px;
+  font-family: 'PPNeueBit', sans-serif;
+  font-size: 18px;
+  font-weight: bold;
+  background: linear-gradient(135deg, #6d009f, #a020f0);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(109,0,159,0.5);
+  transition: transform 0.1s, box-shadow 0.2s;
+}
+
+.btn-retry:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(109,0,159,0.65);
+}
+
+.btn-retry:active {
+  transform: translateY(0);
+}
+
+/* ─── CANVAS ─── */
+.canvas-wrapper {
+  position: relative;
+  max-width: 100%;
+  width: 800px;
+  margin: 10px auto 16px;
+  border: 9px solid #000000;
+}
+
+.game-canvas {
+  /* Scala la canvas mantenendo le proporzioni: i keypoints rimangono allineati
+     perché la canvas interna è sempre 640×480; solo la visualizzazione CSS è più grande */
+  width: 100%;
+  height: auto;
+  transform: scaleX(-1); /* Specchiamento per effetto specchio webcam */
+  display: block;
+}
+
+/* ─── OVERLAY DI FINE PARTITA (testo HTML vero, non canvas) ─── */
+.end-screen-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 20px;
+  text-align: center;
+  font-family: 'PPNeueBit', sans-serif;
+  line-height: normal;
+  pointer-events: none; /* non deve bloccare eventuali click/hover sulla canvas */
+}
+
+.end-screen-title {
+  margin: 0 0 4px;
+  font-size: clamp(34px, 6vw, 52px);
+  font-weight: bold;
+  letter-spacing: 1px;
+  color: #ffffff;
+  text-shadow: 0 0 14px rgba(0,0,0,0.9), 0 0 26px currentColor, 0 2px 4px rgba(0,0,0,0.9);
+}
+
+.end-screen-overlay.is-victory .end-screen-title {
+  color: #00FF66;
+}
+
+.end-screen-overlay.is-defeat .end-screen-title {
+  color: #ffffff;
+}
+
+.end-screen-subtitle {
+  margin: 0 0 8px;
+  font-size: 13px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #f0f0f0;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.9);
+}
+
+.end-screen-stats {
+  list-style: none;
+  margin: 0 0 10px;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.end-screen-stats li {
+  font-size: 16px;
+  font-weight: bold;
+  color: #ffffff;
+  text-shadow: 0 1px 5px rgba(0,0,0,0.95), 0 0 10px rgba(0,0,0,0.7);
+}
+
+.end-screen-stats li span {
+  margin-right: 6px;
+  font-weight: normal;
+  opacity: 0.9;
+}
+
+.end-screen-stats .stat-golden b { color: #FFD700; }
+.end-screen-stats .stat-pigna b { color: #FFAA55; }
+.end-screen-stats .stat-missed b { color: #FF4444; }
+.end-screen-stats .stat-lives b { color: #00FF66; }
+
+.end-screen-score {
+  margin: 4px 0 0;
+  font-size: 24px;
+  font-weight: bold;
+  color: #ffffff;
+  text-shadow: 0 0 10px rgba(0,0,0,0.9), 0 2px 4px rgba(0,0,0,0.9);
+}
+
+.end-screen-record {
+  margin: 2px 0 12px;
+  font-size: 15px;
+  font-weight: bold;
+  color: #FFD700;
+  text-shadow: 0 1px 5px rgba(0,0,0,0.9);
+}
+
+.end-screen-hint {
+  margin: 0;
+  font-size: 13px;
+  color: #eeeeee;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.9);
+}
+
+/* ─── BOTTOM BAR ─── */
+.bottom-bar {
+  display: flex;
+  justify-content: center;
+  padding: 14px 0 30px;
+}
+
+/* Bottone "Torna al Menu" — tema piccione/viola */
+.btn-back-pigeon {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 28px;
+  font-family: 'PPNeueBit', sans-serif;
+  font-size: 20px;
+  font-weight: bold;
+  color: #ffffff;
+  background: linear-gradient(135deg, #1a0030 0%, #6d009f 60%, #a020f0 100%);
+  border: 3px solid #a020f0;
+  border-radius: 12px;
+  cursor: pointer;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  box-shadow:
+    0 0 0 3px rgba(160, 32, 240, 0.2),
+    0 6px 20px rgba(109, 0, 159, 0.55),
+    inset 0 1px 0 rgba(255,255,255,0.12);
+  transition:
+    transform 0.12s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.btn-back-pigeon:hover {
+  background: linear-gradient(135deg, #2a004d 0%, #8a00c8 60%, #c040ff 100%);
+  box-shadow:
+    0 0 0 3px rgba(192, 64, 255, 0.35),
+    0 8px 28px rgba(109, 0, 159, 0.7),
+    inset 0 1px 0 rgba(255,255,255,0.18);
+  transform: translateY(-3px);
+}
+
+.btn-back-pigeon:active {
+  transform: translateY(0px);
+  box-shadow:
+    0 0 0 3px rgba(160, 32, 240, 0.2),
+    0 3px 10px rgba(109, 0, 159, 0.45);
+}

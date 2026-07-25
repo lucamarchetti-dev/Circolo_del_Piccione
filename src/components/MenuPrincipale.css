@@ -1,0 +1,414 @@
+/* ═══════════════════════════════════════════════════════════════
+   MENU PRINCIPALE — CIRCOLO DEI PICCIONI
+   Retro arcade / CRT cabinet aesthetic
+   Fonts: Press Start 2P (display) · Bungee (body)
+═══════════════════════════════════════════════════════════════ */
+@import url('https://fonts.googleapis.com/css2?family=Bungee&family=Press+Start+2P&display=swap');
+
+/* ── Base reset for the menu context ── */
+.menu-wrapper *,
+.menu-wrapper *::before,
+.menu-wrapper *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* ── Wrapper ── */
+.menu-wrapper {
+  position: relative;
+  min-height: 100vh;
+  width: 100%;
+  background-color: #0b0700;
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 52px 24px 36px;
+  gap: 44px;
+  overflow: hidden;
+}
+
+/* Dark overlay on the background image */
+.menu-wrapper::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    160deg,
+    rgba(5, 3, 0, 0.82) 0%,
+    rgba(15, 8, 0, 0.75) 50%,
+    rgba(5, 3, 0, 0.88) 100%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Radial glow from top-center — gives a spotlight feel */
+.menu-wrapper::after {
+  content: '';
+  position: absolute;
+  top: -10%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 70%;
+  height: 60%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(248, 170, 3, 0.12) 0%,
+    transparent 70%
+  );
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── CRT Scanlines — the signature moment ── */
+.menu-scanlines {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.09) 0px,
+    rgba(0, 0, 0, 0.09) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  mix-blend-mode: overlay;
+}
+
+/* ── HEADER ── */
+.menu-header {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+  text-align: center;
+  max-width: 680px;
+  width: 100%;
+}
+
+.menu-logo-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  flex-wrap: wrap;
+}
+
+.menu-logo-img {
+  width: 60px;
+  height: auto;
+  filter: drop-shadow(0 0 14px rgba(248, 170, 3, 0.85));
+  animation: pigeon-bob 3.2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+.menu-logo-img--flip {
+  transform: scaleX(-1);
+  animation-delay: -1.6s;
+}
+
+@keyframes pigeon-bob {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-10px); }
+}
+
+.menu-logo-img--flip {
+  transform: scaleX(-1) translateY(0);
+}
+.menu-logo-img--flip {
+  animation: pigeon-bob-flip 3.2s ease-in-out infinite;
+  animation-delay: -1.6s;
+}
+@keyframes pigeon-bob-flip {
+  0%, 100% { transform: scaleX(-1) translateY(0); }
+  50%       { transform: scaleX(-1) translateY(-10px); }
+}
+
+.menu-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(1.5rem, 3vw, 2.3rem);
+  line-height: 1.5;
+  color: #f8aa03;
+  letter-spacing: 2px;
+  text-shadow:
+    0 0 8px rgba(248, 170, 3, 0.95),
+    0 0 28px rgba(248, 170, 3, 0.55),
+    4px 4px 0 rgba(80, 40, 0, 0.9);
+  animation: title-glow 2.8s ease-in-out infinite;
+}
+
+@keyframes title-glow {
+  0%, 100% {
+    text-shadow:
+      0 0 8px rgba(248, 170, 3, 0.95),
+      0 0 28px rgba(248, 170, 3, 0.5),
+      4px 4px 0 rgba(80, 40, 0, 0.9);
+  }
+  50% {
+    text-shadow:
+      0 0 16px rgba(248, 170, 3, 1),
+      0 0 50px rgba(248, 170, 3, 0.7),
+      4px 4px 0 rgba(80, 40, 0, 0.9);
+  }
+}
+
+.menu-welcome {
+  font-family: 'Bungee', sans-serif;
+  font-size: clamp(1rem, 2.2vw, 1.25rem);
+  color: #ffd87a;
+  line-height: 1.65;
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.9);
+  max-width: 520px;
+}
+
+.menu-choose-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.62rem;
+  color: #9a6a10;
+  letter-spacing: 3px;
+  animation: label-blink 1.4s step-end infinite;
+}
+
+@keyframes label-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+/* ── CARDS GRID ── */
+.menu-cards {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 28px;
+  width: 100%;
+  max-width: 860px;
+}
+
+@media (max-width: 640px) {
+  .menu-cards {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+}
+
+/* ── GAME CARD ── */
+.game-card {
+  --accent: #f8aa03;
+
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  background: rgba(8, 5, 1, 0.92);
+  border: 2px solid rgba(255, 255, 255, 0.07);
+  border-radius: 3px;
+  overflow: hidden;
+  cursor: pointer;
+  text-align: left;
+  padding: 0;
+  transition:
+    transform 0.22s ease,
+    box-shadow 0.22s ease,
+    border-color 0.22s ease;
+  box-shadow: 0 6px 28px rgba(0, 0, 0, 0.7);
+  /* Reset button default styles */
+  font: inherit;
+  background-color: rgba(8, 5, 1, 0.92);
+}
+
+.game-card:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.game-card:hover,
+.game-card--hovered {
+  transform: translateY(-8px) scale(1.02);
+  border-color: var(--accent);
+  box-shadow:
+    0 0 0 1px var(--accent),
+    0 16px 48px rgba(0, 0, 0, 0.85),
+    0 0 36px rgba(var(--accent-rgb, 248 170 3) / 0.25);
+}
+
+/* Cover area */
+.game-card__cover {
+  position: relative;
+  width: 100%;
+  height: 210px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.game-card__bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  filter: saturate(0.75) brightness(0.65);
+  transition: transform 0.45s ease, filter 0.3s ease;
+}
+
+.game-card:hover .game-card__bg,
+.game-card--hovered .game-card__bg {
+  transform: scale(1.08);
+  filter: saturate(1.1) brightness(0.85);
+}
+
+/* Pigeon flying in the sky for PigeonBlaster card */
+.game-card__pigeon-overlay {
+  position: absolute;
+  bottom: 12px;
+  right: 14px;
+  height: 90px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.9));
+  transition: transform 0.3s ease;
+  z-index: 2;
+}
+
+.game-card:hover .game-card__pigeon-overlay,
+.game-card--hovered .game-card__pigeon-overlay {
+  transform: translateY(-6px) scale(1.08);
+}
+
+/* Gradient from cover to body */
+.game-card__vignette {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 35%,
+    rgba(8, 5, 1, 0.97) 100%
+  );
+  z-index: 1;
+}
+
+/* Genre tag */
+.game-card__tag {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 3;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.48rem;
+  letter-spacing: 0.5px;
+  background: var(--accent);
+  color: #000000;
+  padding: 5px 9px;
+  border-radius: 2px;
+  text-transform: uppercase;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.6);
+  line-height: 1.4;
+}
+
+/* Card body */
+.game-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px 20px 22px;
+  flex: 1;
+}
+
+.game-card__title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: clamp(0.7rem, 1.8vw, 0.92rem);
+  line-height: 1.5;
+  color: #ffffff;
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.game-card__icon {
+  font-size: 1.2em;
+}
+
+.game-card__desc {
+  font-family: 'Bungee', sans-serif;
+  font-size: 0.92rem;
+  color: #c09a5e;
+  line-height: 1.55;
+}
+
+/* Play button */
+.game-card__play-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.58rem;
+  letter-spacing: 1px;
+  color: var(--accent);
+  padding: 9px 14px;
+  border: 1.5px solid var(--accent);
+  border-radius: 2px;
+  background: transparent;
+  transition: background 0.2s ease, color 0.2s ease;
+  width: fit-content;
+  margin-top: 4px;
+  line-height: 1.4;
+}
+
+.game-card:hover .game-card__play-btn,
+.game-card--hovered .game-card__play-btn {
+  background: var(--accent);
+  color: #000000;
+}
+
+/* ── FOOTER ── */
+.menu-footer {
+  position: relative;
+  z-index: 1;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 0.42rem;
+  color: #4e300a;
+  letter-spacing: 2px;
+  text-align: center;
+  line-height: 2;
+  opacity: 0.85;
+}
+
+/* ── Responsive tweaks ── */
+@media (max-width: 480px) {
+  .menu-wrapper {
+    padding: 36px 16px 28px;
+    gap: 32px;
+  }
+
+  .menu-logo-img {
+    width: 46px;
+  }
+
+  .game-card__cover {
+    height: 170px;
+  }
+
+  .game-card__body {
+    padding: 14px 16px 18px;
+    gap: 8px;
+  }
+}
+
+/* ── Reduced motion ── */
+@media (prefers-reduced-motion: reduce) {
+  .menu-logo-img,
+  .menu-logo-img--flip,
+  .menu-title,
+  .menu-choose-label {
+    animation: none;
+  }
+}
