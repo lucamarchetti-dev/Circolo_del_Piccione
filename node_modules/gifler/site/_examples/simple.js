@@ -1,1 +1,0 @@
-gifler('assets/gif/run.gif').animate('canvas.running-pikachu')
